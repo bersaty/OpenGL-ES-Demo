@@ -13,7 +13,7 @@ import javax.microedition.khronos.opengles.GL10;
 /**
  * Created by 蘑菇&罐头 on 2016/7/23.
  */
-class TriangleRenderer implements GLSurfaceView.Renderer {
+class TriangleRenderer extends BaseRenderer {
 
     private float ratio;
 
@@ -44,6 +44,7 @@ class TriangleRenderer implements GLSurfaceView.Renderer {
         gl10.glLoadIdentity();
 
         GLU.gluLookAt(gl10,0,0,5,0,0,0,0,1,0);
+        super.onDrawFrame(gl10);
 
         ByteBuffer byteBuffer = ByteBuffer.allocateDirect(corrds.length*4);
         byteBuffer.order(ByteOrder.nativeOrder());

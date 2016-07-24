@@ -14,15 +14,22 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
+        <Spinner
+            android:layout_width="wrap_content"
+            android:id="@+id/spinner"
+            android:layout_height="wrap_content"></Spinner>
+
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="2dp"
+        android:id="@+id/btnx"
         android:text="x軸"
         android:layout_weight="1"/>
         <Button
             android:layout_width="wrap_content"
             android:layout_marginLeft="2dp"
+            android:id="@+id/btny"
             android:layout_height="wrap_content"
             android:text="y軸"
             android:layout_weight="1"/>
@@ -31,6 +38,7 @@
             android:layout_marginLeft="2dp"
             android:layout_height="wrap_content"
             android:text="z軸"
+            android:id="@+id/btnz"
             android:layout_weight="1"/>
     </LinearLayout>
 </LinearLayout>
