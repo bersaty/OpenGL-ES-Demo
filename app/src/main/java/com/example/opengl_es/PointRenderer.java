@@ -42,12 +42,15 @@ public class PointRenderer extends BaseRenderer {
 
         super.onDrawFrame(gl10);
 
-        float r= 0.5f;//半径
+        float r= 0f;//半径
         //计算点
         List<Float> ponitList = new ArrayList<Float>();
         float zdeata = 0.01f;
         float x,y,z=1f;
         for (float dr = 0;dr < Math.PI *6;dr = (float) (dr+Math.PI/32)){
+            if(dr <Math.PI*3)
+                r+=0.5/96;
+            else r-=0.5/96;
             x = (float) (r*Math.cos(dr));
             y = (float) (r*Math.sin(dr));
             z = z- zdeata;

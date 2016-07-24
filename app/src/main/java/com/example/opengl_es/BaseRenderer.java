@@ -10,10 +10,10 @@ import javax.microedition.khronos.opengles.GL10;
  */
 public class BaseRenderer implements GLSurfaceView.Renderer {
 
-    //顺时针为负
-    protected float rotateDeta;
-    //x，y，z轴选择的方向
-    protected float rotateXdir,rotateYdir,rotateZdir;
+    //旋转角度，顺时针为负
+    public float rotateDetaX;
+    public float rotateDetaY;
+    public float rotateDetaZ;
     @Override
     public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
 
@@ -26,14 +26,9 @@ public class BaseRenderer implements GLSurfaceView.Renderer {
 
     @Override
     public void onDrawFrame(GL10 gl10) {
-        gl10.glRotatef(rotateDeta,rotateXdir,rotateYdir,rotateZdir);
+        gl10.glRotatef(rotateDetaX,1,0,0);
+        gl10.glRotatef(rotateDetaY,0,1,0);
+        gl10.glRotatef(rotateDetaZ,0,0,1);
     }
 
-    public void setRotate(float rotateDeta,float rotateXdir,float rotateYdir,float rotateZdir){
-        this.rotateDeta += rotateDeta;
-        this.rotateXdir = rotateXdir;
-        this.rotateYdir = rotateYdir;
-        this.rotateZdir = rotateZdir;
-
-    }
 }

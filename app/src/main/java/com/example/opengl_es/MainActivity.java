@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         MyGLsurfaceView gLsurfaceView = new MyGLsurfaceView(this);
-        render = new TriangleRenderer();
+        render = new PointRenderer();
         gLsurfaceView.setRenderer(render);
         setContentView(R.layout.activity_main);
         LinearLayout linearLayout = (LinearLayout) findViewById(R.id.linearlayout);
@@ -49,6 +49,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Button btnX = (Button) findViewById(R.id.btnx);
         Button btnY = (Button) findViewById(R.id.btny);
         Button btnZ = (Button) findViewById(R.id.btnz);
+        Button btnReset = (Button) findViewById(R.id.btnreset);
+        btnReset.setOnClickListener(this);
         btnX.setOnClickListener(this);
         btnY.setOnClickListener(this);
         btnZ.setOnClickListener(this);
@@ -63,13 +65,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         switch (view.getId()){
             case R.id.btnx:
-                render.setRotate((float) (Math.PI/4)*d,1,0,0);
+                render.rotateDetaX +=(float) (Math.PI/4)*d;
                 break;
             case R.id.btny:
-                render.setRotate((float) (Math.PI/4)*d,0,1,0);
+                render.rotateDetaY +=(float) (Math.PI/4)*d;
                 break;
             case R.id.btnz:
-                render.setRotate((float) (Math.PI/4)*d,0,0,1);
+                render.rotateDetaZ +=(float) (Math.PI/4)*d;
+                break;
+            case R.id.btnreset:
+                render.rotateDetaX = 0;
+                render.rotateDetaZ = 0;
+                render.rotateDetaY = 0;
                 break;
         }
     }
