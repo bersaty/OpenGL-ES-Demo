@@ -23,15 +23,18 @@ import javax.microedition.khronos.opengles.GL11;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
     BaseRenderer render;
     Spinner spinner;
+    MyGLsurfaceView gLsurfaceView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        MyGLsurfaceView gLsurfaceView = new MyGLsurfaceView(this);
-        render = new PointRenderer();
+        gLsurfaceView = new MyGLsurfaceView(this);
+        render = new CubeRenderer();
         gLsurfaceView.setRenderer(render);
         setContentView(R.layout.activity_main);
         LinearLayout linearLayout = (LinearLayout) findViewById(R.id.linearlayout);
         linearLayout.addView(gLsurfaceView);
+        //高性能，不持续，需要手动刷新
+        gLsurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
 
         spinner = (Spinner) findViewById(R.id.spinner);
         //数据
@@ -79,6 +82,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 render.rotateDetaY = 0;
                 break;
         }
+        gLsurfaceView.requestRender();
     }
 
     class MyGLsurfaceView extends GLSurfaceView{
