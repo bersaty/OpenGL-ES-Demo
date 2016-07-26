@@ -1,0 +1,7 @@
+<resources>
+    <array name="list_item">
+        <item>OpenGLES10Activity</item>
+        <item>OpenGLES20TriangleActivity</item>
+        <item>OpenGLES20LightActivity</item>
+    </array>
+</resources>

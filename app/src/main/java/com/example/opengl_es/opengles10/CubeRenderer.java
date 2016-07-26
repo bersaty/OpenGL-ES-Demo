@@ -1,4 +1,4 @@
-package com.example.opengl_es;
+package com.example.opengl_es.opengles10;
 
 import android.opengl.GLU;
 
