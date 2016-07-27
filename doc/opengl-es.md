@@ -15,6 +15,7 @@ OpenGL着色语言（OpenGL Shading Language）是用来在OpenGL中着色编程
 http://my.oschina.net/sweetdark/blog/208024
 
 #####着色器 shader
+OpenGL 2.0 上我们想要绘制任何东西都需要一个vertexShader和fragment Shader。
 
 #####相关资料：
 英文比较完整的教程：
@@ -49,6 +50,7 @@ GLSL 语言
 https://www.opengl.org/registry/doc/GLSLangSpec.Full.1.20.8.pdf
 http://my.oschina.net/sweetdark/blog/208024
 http://blog.csdn.net/renai2008/article/details/7844495
+http://blog.csdn.net/hgl868/article/details/7846269
 MVP矩阵
 https://4gamers.cn/blog/2014-06-15-opengl-es2-meet-mvp.html
 
