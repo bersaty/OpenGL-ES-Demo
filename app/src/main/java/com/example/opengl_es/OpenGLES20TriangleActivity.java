@@ -6,7 +6,6 @@ import android.content.pm.ConfigurationInfo;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -101,17 +100,6 @@ public class OpenGLES20TriangleActivity extends AppCompatActivity implements Vie
         mGLSurfaceView.requestRender();
     }
 
-    class MyGLsurfaceView extends GLSurfaceView{
-
-        public MyGLsurfaceView(Context context, AttributeSet attrs) {
-            super(context, attrs);
-        }
-
-        public MyGLsurfaceView(Context context) {
-            super(context);
-        }
-    }
-
     @Override
     protected void onResume()
     {
@@ -127,4 +115,5 @@ public class OpenGLES20TriangleActivity extends AppCompatActivity implements Vie
         super.onPause();
         mGLSurfaceView.onPause();
     }
+
 }
