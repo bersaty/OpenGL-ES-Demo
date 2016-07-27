@@ -1,5 +1,3 @@
 # openglDemo
-opengl练习
-
-1、绘制三角形
-2、绘制球形
+1、[相关概念](https://github.com/wbersaty/openglDemo/blob/master/doc/opengl-es.md)  
+2、[三角形的绘](https://github.com/wbersaty/openglDemo/blob/master/doc/drawtriangle.md)
