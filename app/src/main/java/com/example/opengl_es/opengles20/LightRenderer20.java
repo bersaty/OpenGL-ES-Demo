@@ -450,28 +450,28 @@ public class LightRenderer20 implements GLSurfaceView.Renderer
         Matrix.multiplyMV(mLightPosInEyeSpace, 0, mViewMatrix, 0, mLightPosInWorldSpace, 0);
 
         // Draw some cubes.
-        Matrix.setIdentityM(mModelMatrix, 0);
-        Matrix.translateM(mModelMatrix, 0, 4.0f, 0.0f, -7.0f);
-        Matrix.rotateM(mModelMatrix, 0, angleInDegrees, 1.0f, 0.0f, 0.0f);
-        drawCube();
-
-        Matrix.setIdentityM(mModelMatrix, 0);
-        Matrix.translateM(mModelMatrix, 0, -4.0f, 0.0f, -7.0f);
-        Matrix.rotateM(mModelMatrix, 0, angleInDegrees, 0.0f, 1.0f, 0.0f);
-        drawCube();
-
-        Matrix.setIdentityM(mModelMatrix, 0);
-        Matrix.translateM(mModelMatrix, 0, 0.0f, 4.0f, -7.0f);
-        Matrix.rotateM(mModelMatrix, 0, angleInDegrees, 0.0f, 0.0f, 1.0f);
-        drawCube();
-
-        Matrix.setIdentityM(mModelMatrix, 0);
-        Matrix.translateM(mModelMatrix, 0, 0.0f, -4.0f, -7.0f);
-        drawCube();
+//        Matrix.setIdentityM(mModelMatrix, 0);
+//        Matrix.translateM(mModelMatrix, 0, 4.0f, 0.0f, -7.0f);
+//        Matrix.rotateM(mModelMatrix, 0, angleInDegrees, 1.0f, 0.0f, 0.0f);
+//        drawCube();
+//
+//        Matrix.setIdentityM(mModelMatrix, 0);
+//        Matrix.translateM(mModelMatrix, 0, -4.0f, 0.0f, -7.0f);
+//        Matrix.rotateM(mModelMatrix, 0, angleInDegrees, 0.0f, 1.0f, 0.0f);
+//        drawCube();
+//
+//        Matrix.setIdentityM(mModelMatrix, 0);
+//        Matrix.translateM(mModelMatrix, 0, 0.0f, 4.0f, -7.0f);
+//        Matrix.rotateM(mModelMatrix, 0, angleInDegrees, 0.0f, 0.0f, 1.0f);
+//        drawCube();
+//
+//        Matrix.setIdentityM(mModelMatrix, 0);
+//        Matrix.translateM(mModelMatrix, 0, 0.0f, -4.0f, -7.0f);
+//        drawCube();
 
         Matrix.setIdentityM(mModelMatrix, 0);
         Matrix.translateM(mModelMatrix, 0, 0.0f, 0.0f, -5.0f);
-        Matrix.rotateM(mModelMatrix, 0, angleInDegrees, 1.0f, 1.0f, 0.0f);
+        Matrix.rotateM(mModelMatrix, 0, 45f, 1.0f, 1.0f, 0.0f);
         drawCube();
 
         // Draw a point to indicate the light.
