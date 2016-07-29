@@ -1,3 +1,12 @@
 # openglDemo
-1、[相关概念](https://github.com/wbersaty/openglDemo/blob/master/doc/opengl-es.md)  
-2、[三角形的绘](https://github.com/wbersaty/openglDemo/blob/master/doc/drawtriangle.md)
+1、[相关概念](doc/OpenGL-ES-2.0-Introduction.md)  
+
+2、[三角形的绘制](doc/DrawTriangle.md)
+
+3、[光照](doc/Light.md)
+
+4、[管线](doc/OpenGL-ES-2.0-PipeLine.md)
+
+5、[顶点缓冲区对象](doc/Vertex-Buffer-Objects.md)
+
+6、[]()
