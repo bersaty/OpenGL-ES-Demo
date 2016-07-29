@@ -1,4 +1,5 @@
-####Vertex Buffer Objects (VBOS) 顶点缓冲区对象
+### Vertex Buffer Objects (VBOS) 顶点缓冲区对象
+
 目前我们绘制所需要的数据都是保存在客户端里，当需要渲染的时候才传到GPU里。
 OpenGL ES是一个底层库，数据存储对应native堆，而Android应用是跑在dalvik虚拟机里面的，数据对应dalvik堆，因此我们需要分配一个缓冲区以便OpenGL可以访问。
 
@@ -39,6 +40,7 @@ GLES20.glEnableVertexAttribArray(mPositionHandle);
 GLES20.glVertexAttribPointer(mPositionHandle, POSITION_DATA_SIZE,
 GLES20.GL_FLOAT, false, 0, mCubePositions);
 ```
+
 | 参数 | 解释 |
 |--------|--------|
 | mPositionHandle | The OpenGL index of the position attribute of our shader program. |
@@ -49,6 +51,7 @@ GLES20.GL_FLOAT, false, 0, mCubePositions);
 |mCubePositions|The pointer to our buffer, containing all of the positional data.|
 
 数据缓冲区可以分开写，也可以一起写：
+
 ```
 positions = X,Y,Z, X, Y, Z, X, Y, Z, …
 colors = R, G, B, A, R, G, B, A, …
@@ -61,9 +64,11 @@ buffer = X, Y, Z, R, G, B, A, S, T, …
 如果把信息都写在一起渲染速度会更快，因为都在一块i内存里面，但是更新会比较困难，如果我们的数据变化大，非常难维护。我们需要告诉OpenGL顶点需要多少字节，每一个顶点的数据的偏移量。
 
 偏移量计算公式，传递给glVertexAttribPointer的偏移量的单位是字节。
+
 ```
 final int stride = (POSITION_DATA_SIZE + NORMAL_DATA_SIZE + TEXTURE_COORDINATE_DATA_SIZE) * BYTES_PER_FLOAT;
 ```
+
 ```
 // Pass in the position information
 mCubeBuffer.position(0);
@@ -78,6 +83,7 @@ GLES20.glVertexAttribPointer(mNormalHandle, NORMAL_DATA_SIZE,
 GLES20.GL_FLOAT, false, stride, mCubeBuffer);
 ...
 ```
+
 OpenGL通过偏移量计算下一个顶点的数据。
 
 
