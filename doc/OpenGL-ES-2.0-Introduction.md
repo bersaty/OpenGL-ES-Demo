@@ -20,6 +20,7 @@ OpenGL 2.0 上我们想要绘制任何东西都需要一个vertexShader和fragme
 ### 相关资料：
 英文比较完整的教程：
 http://www.learnopengles.com/
+http://blog.csdn.net/kesalin/article/details/8451595
 
 透视变换
 http://tangzm.com/blog/?p=202
