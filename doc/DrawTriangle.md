@@ -54,15 +54,43 @@ OpenGL 1.0遗留下来的，2.0之后不用使用了。
 ```
 
 在onSurfaceCreateed里面初始化需要做的工作:
-1、清屏，相当于设置背景颜色，GLES20.glClearColor。
-2、初始化相机位置，Matrix.setLookAtM。
-3、编写着色器程序，vertexShader和fragmentShader。
+0、初始化数据点
+1、清屏，相当于设置背景颜色，GLES20.glClearColor
+2、初始化相机位置，Matrix.setLookAtM
+3、编写着色器程序，vertexShader和fragmentShader
 4、加载着色器
 5、编译着色器
 6、创建程序
 7、加载上面两个着色器到程序里
 8、将程序设置到GPU运行
+
+
+
 ```java
+
+    /**
+     * 初始化顶点数据
+     */
+    public TriangleRenderer20() {
+        // 三角形的颜色红，绿，蓝
+        final float[] triangle1VerticesData = {
+                // X, Y, Z,
+                // R, G, B, A
+                -0.5f, -0.25f, 0.0f,
+                1.0f, 0.0f, 0.0f, 1.0f,
+
+                0.5f, -0.25f, 0.0f,
+                0.0f, 0.0f, 1.0f, 1.0f,
+
+                0.0f, 0.559016994f, 0.0f,
+                0.0f, 1.0f, 0.0f, 1.0f};
+
+        // 将顶点数据转化成FloatBuffer
+        mTriangle1Vertices = ByteBuffer.allocateDirect(triangle1VerticesData.length * mBytesPerFloat)
+                .order(ByteOrder.nativeOrder()).asFloatBuffer();
+        mTriangle1Vertices.put(triangle1VerticesData).position(0);
+    }
+
         @Override
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         //请屏颜色 4个参数分别对应R，G，B，A（红，绿，蓝，透明度）

@@ -23,6 +23,8 @@
         <activity android:name=".OpenGLES10Activity"></activity>
         <activity android:name=".OpenGLES20TriangleActivity"></activity>
         <activity android:name=".OpenGLES20LightActivity"></activity>
+        <activity android:name=".OpenGLES10TriangleActivity"></activity>
+        <activity android:name=".OpenGLES10PointActivity"></activity>
     </application>
 
 </manifest>

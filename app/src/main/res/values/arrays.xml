@@ -3,5 +3,7 @@
         <item>OpenGLES10Activity</item>
         <item>OpenGLES20TriangleActivity</item>
         <item>OpenGLES20LightActivity</item>
+        <item>OpenGLES10TriangleActivity</item>
+        <item>OpenGLES10PointActivity</item>
     </array>
 </resources>

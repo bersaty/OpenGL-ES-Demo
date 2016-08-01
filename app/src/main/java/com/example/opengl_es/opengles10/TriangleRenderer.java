@@ -12,7 +12,7 @@ import javax.microedition.khronos.opengles.GL10;
 /**
  * Created by 蘑菇&罐头 on 2016/7/23.
  */
-class TriangleRenderer extends BaseRenderer {
+public class TriangleRenderer extends BaseRenderer {
 
     private float ratio;
 
