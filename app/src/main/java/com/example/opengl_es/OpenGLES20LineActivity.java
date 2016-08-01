@@ -9,13 +9,15 @@ public class OpenGLES20LineActivity extends OpenGLES20BaseActivity implements Vi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        render = new LineRenderer20();
         if (supportsEs2)
         {
             // Request an OpenGL ES 2.0 compatible context.
             mGLSurfaceView.setEGLContextClientVersion(2);
 
             // Set the renderer to our demo renderer, defined below.
-            mGLSurfaceView.setRenderer(new LineRenderer20());
+            mGLSurfaceView.setRenderer(render);
         }
         else
         {

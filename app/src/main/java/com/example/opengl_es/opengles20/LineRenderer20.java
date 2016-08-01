@@ -1,7 +1,6 @@
 package com.example.opengl_es.opengles20;
 
 import android.opengl.GLES20;
-import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.os.SystemClock;
 
@@ -15,7 +14,7 @@ import javax.microedition.khronos.opengles.GL10;
 /**
  * Created by wuchunhui on 16-7-26.
  */
-public class LineRenderer20 implements GLSurfaceView.Renderer {
+public class LineRenderer20 extends BaseRenderer20 {
     //4x4矩阵表示显示的物体
     private float[] mModelMatrix = new float[16];
 
@@ -208,7 +207,8 @@ public class LineRenderer20 implements GLSurfaceView.Renderer {
 
         // Draw the triangle facing straight on.
         Matrix.setIdentityM(mModelMatrix, 0);
-        Matrix.rotateM(mModelMatrix, 0, angleInDegrees, 0.0f, 0.0f, 1.0f);
+//        Matrix.rotateM(mModelMatrix, 0, angleInDegrees, 0.0f, 0.0f, 1.0f);
+        rotate(mModelMatrix);
         drawLines(mLinesVerticesFloatBuffer);
 
     }

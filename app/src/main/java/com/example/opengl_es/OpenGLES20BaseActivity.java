@@ -12,11 +12,13 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 
+import com.example.opengl_es.opengles20.BaseRenderer20;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class OpenGLES20BaseActivity extends AppCompatActivity implements View.OnClickListener{
-    GLSurfaceView.Renderer render;
+    BaseRenderer20 render;
     Spinner spinner;
     GLSurfaceView mGLSurfaceView;
     boolean supportsEs2;
@@ -60,27 +62,27 @@ public class OpenGLES20BaseActivity extends AppCompatActivity implements View.On
 
     @Override
     public void onClick(View view) {
-//        String selectedItem = (String) spinner.getSelectedItem();
-//        int d= 1;
-//        if(selectedItem.equals("顺时针"))
-//            d = -1;
-//
-//        switch (view.getId()){
-//            case R.id.btnx:
-//                render.rotateDetaX +=(float) (Math.PI/2)*d;
-//                break;
-//            case R.id.btny:
-//                render.rotateDetaY +=(float) (Math.PI/2)*d;
-//                break;
-//            case R.id.btnz:
-//                render.rotateDetaZ +=(float) (Math.PI/2)*d;
-//                break;
-//            case R.id.btnreset:
-//                render.rotateDetaX = 0;
-//                render.rotateDetaZ = 0;
-//                render.rotateDetaY = 0;
-//                break;
-//        }
+        String selectedItem = (String) spinner.getSelectedItem();
+        int d= 1;
+        if(selectedItem.equals("顺时针"))
+            d = -1;
+
+        switch (view.getId()){
+            case R.id.btnx:
+                render.angleDegreeX += (float) (Math.PI/2)*d;
+                break;
+            case R.id.btny:
+                render.angleDegreeY += (float) (Math.PI/2)*d;
+                break;
+            case R.id.btnz:
+                render.angleDegreeZ += (float) (Math.PI/2)*d;
+                break;
+            case R.id.btnreset:
+                render.angleDegreeX += 0;
+                render.angleDegreeY += 0;
+                render.angleDegreeZ += 0;
+                break;
+        }
 //        mGLSurfaceView.requestRender();
     }
 

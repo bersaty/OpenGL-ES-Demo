@@ -9,13 +9,14 @@ public class OpenGLES20PointActivity extends OpenGLES20BaseActivity implements V
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        render = new PointRenderer20();
         if (supportsEs2)
         {
             // Request an OpenGL ES 2.0 compatible context.
             mGLSurfaceView.setEGLContextClientVersion(2);
 
             // Set the renderer to our demo renderer, defined below.
-            mGLSurfaceView.setRenderer(new PointRenderer20());
+            mGLSurfaceView.setRenderer(render);
         }
         else
         {

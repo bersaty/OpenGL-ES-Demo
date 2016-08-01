@@ -9,13 +9,14 @@ public class OpenGLES20LightActivity extends OpenGLES20BaseActivity implements V
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        render = new LightRenderer20();
         if (supportsEs2)
         {
             // Request an OpenGL ES 2.0 compatible context.
             mGLSurfaceView.setEGLContextClientVersion(2);
 
             // Set the renderer to our demo renderer, defined below.
-            mGLSurfaceView.setRenderer(new LightRenderer20());
+            mGLSurfaceView.setRenderer(render);
         }
         else
         {

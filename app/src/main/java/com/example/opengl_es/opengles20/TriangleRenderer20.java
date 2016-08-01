@@ -1,7 +1,6 @@
 package com.example.opengl_es.opengles20;
 
 import android.opengl.GLES20;
-import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.os.SystemClock;
 
@@ -20,7 +19,7 @@ import javax.microedition.khronos.opengles.GL10;
  * This class implements our custom renderer. Note that the GL10 parameter passed in is unused for OpenGL ES 2.0
  * renderers -- the static class GLES20 is used instead.
  */
-public class TriangleRenderer20 implements GLSurfaceView.Renderer {
+public class TriangleRenderer20 extends BaseRenderer20 {
     /**
      * Store the model matrix. This matrix is used to move models from object space (where each model can be thought
      * of being located at the center of the universe) to world space.
@@ -292,7 +291,8 @@ public class TriangleRenderer20 implements GLSurfaceView.Renderer {
 
         // Draw the triangle facing straight on.
         Matrix.setIdentityM(mModelMatrix, 0);
-        Matrix.rotateM(mModelMatrix, 0, angleInDegrees, 0.0f, 0.0f, 1.0f);
+//        Matrix.rotateM(mModelMatrix, 0, angleInDegrees, 0.0f, 0.0f, 1.0f);
+        rotate(mModelMatrix);
         drawTriangle(mTriangle1Vertices);
 
     }
