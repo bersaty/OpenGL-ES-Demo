@@ -3,9 +3,9 @@ package com.example.opengl_es;
 import android.os.Bundle;
 import android.view.View;
 
-import com.example.opengl_es.opengles20.LightRenderer20;
+import com.example.opengl_es.opengles20.LineRenderer20;
 
-public class OpenGLES20LightActivity extends OpenGLES20BaseActivity implements View.OnClickListener{
+public class OpenGLES20LineActivity extends OpenGLES20BaseActivity implements View.OnClickListener{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -15,7 +15,7 @@ public class OpenGLES20LightActivity extends OpenGLES20BaseActivity implements V
             mGLSurfaceView.setEGLContextClientVersion(2);
 
             // Set the renderer to our demo renderer, defined below.
-            mGLSurfaceView.setRenderer(new LightRenderer20());
+            mGLSurfaceView.setRenderer(new LineRenderer20());
         }
         else
         {

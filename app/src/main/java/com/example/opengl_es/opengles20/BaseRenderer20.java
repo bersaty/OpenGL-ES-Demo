@@ -6,9 +6,11 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 /**
- * Created by wuchunhui on 16-7-26.
+ * Created by wuchunhui on 16-8-1.
  */
-public class MyRenderer implements GLSurfaceView.Renderer {
+public class BaseRenderer20 implements GLSurfaceView.Renderer {
+
+    float angleInDegrees = 0;
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {

@@ -1,10 +1,8 @@
 package com.example.opengl_es;
 
-import android.content.Context;
 import android.opengl.GLSurfaceView;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.AttributeSet;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -12,26 +10,21 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 
 import com.example.opengl_es.opengles10.BaseRenderer;
-import com.example.opengl_es.opengles10.CubeRenderer;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class OpenGLES10Activity extends AppCompatActivity implements View.OnClickListener{
+public class OpenGLES10BaseActivity extends AppCompatActivity implements View.OnClickListener{
     BaseRenderer render;
     Spinner spinner;
-    MyGLsurfaceView gLsurfaceView;
+    GLSurfaceView gLsurfaceView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        gLsurfaceView = new MyGLsurfaceView(this);
-        render = new CubeRenderer();
-        gLsurfaceView.setRenderer(render);
+        gLsurfaceView = new GLSurfaceView(this);
         setContentView(R.layout.activity_opengles10);
         LinearLayout linearLayout = (LinearLayout) findViewById(R.id.linearlayout);
         linearLayout.addView(gLsurfaceView);
-        //高性能，不持续，需要手动刷新
-        gLsurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
 
         spinner = (Spinner) findViewById(R.id.spinner);
         //数据
@@ -80,17 +73,6 @@ public class OpenGLES10Activity extends AppCompatActivity implements View.OnClic
                 break;
         }
         gLsurfaceView.requestRender();
-    }
-
-    class MyGLsurfaceView extends GLSurfaceView{
-
-        public MyGLsurfaceView(Context context, AttributeSet attrs) {
-            super(context, attrs);
-        }
-
-        public MyGLsurfaceView(Context context) {
-            super(context);
-        }
     }
 
 }

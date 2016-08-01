@@ -2,15 +2,14 @@ package com.example.opengl_es;
 
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
-import android.view.View;
 
-import com.example.opengl_es.opengles10.PointRenderer;
+import com.example.opengl_es.opengles10.CubeRenderer;
 
-public class OpenGLES10PointActivity extends OpenGLES10BaseActivity implements View.OnClickListener{
+public class OpenGLES10CubeActivity extends OpenGLES10BaseActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        render = new PointRenderer();
+        render = new CubeRenderer();
         gLsurfaceView.setRenderer(render);
         //高性能，不持续，需要手动刷新
         gLsurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);

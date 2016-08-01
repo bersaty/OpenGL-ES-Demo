@@ -20,11 +20,13 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".OpenGLES10Activity"></activity>
+        <activity android:name=".OpenGLES10CubeActivity"></activity>
         <activity android:name=".OpenGLES20TriangleActivity"></activity>
         <activity android:name=".OpenGLES20LightActivity"></activity>
         <activity android:name=".OpenGLES10TriangleActivity"></activity>
         <activity android:name=".OpenGLES10PointActivity"></activity>
+        <activity android:name=".OpenGLES20PointActivity"></activity>
+        <activity android:name=".OpenGLES20LineActivity"></activity>
     </application>
 
 </manifest>
