@@ -16,15 +16,41 @@ OpenGL ES 3.0主要新功能有：
 
 ### 相关概念
 
-
-
-### 坐标系
-世界坐标系：
+#### 1、OpenGL世界坐标系：
 
 在OpenGL中，世界坐标系是以屏幕中心为原点(0, 0, 0)，且是始终不变的。你面对
 屏幕，你的右边是x正轴，上面是y正轴，屏幕指向你的为z正轴。长度单位这样来定：
 窗口范围按此单位恰好是(-1,-1)到(1,1)，即屏幕左下角坐标为（-1，-1），右上角
 坐标为（1,1）。
+
+#### 2、3D世界相关设置
+
+![](setlookat.png)
+
+通过这个函数设置眼睛和观察的位置，以及眼睛向上的方向。
+
+```java
+Matrix.setLookAtM(mViewMatrix, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
+
+```
+通过上面设置了眼睛和观察位置之后，就需要根据上面的值设置frustum的相关值。
+
+mProjectionMatrix:用于保存投影矩阵。
+0：offset。
+left：左边的距离（比例）。
+right：右边的距离（比例）。
+bottom：下边的距离（比例）。
+top：上边的距离（比例）。
+near:和近截面的距离， 眼睛距离>=near>=0。
+far：和远截面的距离，far>near。
+
+```java
+Matrix.frustumM(mProjectionMatrix, 0, left, right, bottom, top, near, far);
+```
+
+对应的图如下：
+
+![](frustum.png)
 
 
 ### OpenGL Shader Language （GLSL）语言
