@@ -26,11 +26,11 @@ public class BaseRenderer20 implements GLSurfaceView.Renderer {
     private float[] mBaseMVPMatrix = new float[16];
 
     private FloatBuffer mBaseVertexFloatBuffer;
-    private FloatBuffer mBaseVertexColorFloatBuffer;
 
-    private float mBaseMVPMatrixHandle;
-    private float mBasePositionHandle;
-    private float mBaseColorHandle;
+    private int mBaseMVPMatrixHandle;
+    private int mBasePositionHandle;
+
+    private int mBaseShaderProgram;
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
@@ -43,6 +43,7 @@ public class BaseRenderer20 implements GLSurfaceView.Renderer {
                 1,0,0
 
         };
+
         mBaseVertexFloatBuffer = ByteBuffer.allocateDirect(vertextData.length*4).order(ByteOrder.nativeOrder()).asFloatBuffer();
         mBaseVertexFloatBuffer.put(vertextData).position(0);
 
@@ -51,18 +52,14 @@ public class BaseRenderer20 implements GLSurfaceView.Renderer {
         final String vertex_shader =
                 "uniform mat4 u_MVPMatrix;\n" +
                         "attribute vec4 a_Position;\n" +
-                        "attribute vec4 a_Color;\n" +
-                        "varying vec4 v_Color;\n" +
                         "void main() {\n" +
                         "    gl_Position = u_MVPMatrix * a_Position;\n" +
-                        "    v_Color = a_Color;\n" +
                         "}\n";
 
         final String fragment_shader = "" +
                 "precision mediump float;  \n" +
-                "varying vec4 v_Color;\n" +
                 "void main() {\n" +
-                "    gl_FragColor = v_Color;\n" +
+                "    gl_FragColor = vec4(1.0,0.0,0.0,1.0);\n" +
                 "}\n";
         //加载shader vertex
         int vertextShaderHandle = GLES20.glCreateShader(GLES20.GL_VERTEX_SHADER);
@@ -95,35 +92,31 @@ public class BaseRenderer20 implements GLSurfaceView.Renderer {
             throw new RuntimeException("Error creating fragment shader.");
 
         //创建程序
-        int shaderProgram = GLES20.glCreateProgram();
-        if(shaderProgram != 0){
+        mBaseShaderProgram = GLES20.glCreateProgram();
+        if(mBaseShaderProgram != 0){
             //绑定shader程序
-            GLES20.glAttachShader(shaderProgram,vertextShaderHandle);
-            GLES20.glAttachShader(shaderProgram,fragmentShaderHandle);
+            GLES20.glAttachShader(mBaseShaderProgram,vertextShaderHandle);
+            GLES20.glAttachShader(mBaseShaderProgram,fragmentShaderHandle);
 
             //绑定属性索引，需要我们赋值
-            GLES20.glBindAttribLocation(shaderProgram,0,"a_Position");
-            GLES20.glBindAttribLocation(shaderProgram,1,"a_Color");
+            GLES20.glBindAttribLocation(mBaseShaderProgram,0,"a_Position");
 
-            GLES20.glLinkProgram(shaderProgram);
+            GLES20.glLinkProgram(mBaseShaderProgram);
 
             final int[] linkState = new int[1];
 
-            GLES20.glGetProgramiv(shaderProgram,GLES20.GL_LINK_STATUS,linkState,0);
+            GLES20.glGetProgramiv(mBaseShaderProgram,GLES20.GL_LINK_STATUS,linkState,0);
             if(linkState[0] == 0) {
-                GLES20.glDeleteProgram(shaderProgram);
-                shaderProgram = 0;
+                GLES20.glDeleteProgram(mBaseShaderProgram);
+                mBaseShaderProgram = 0;
             }
         }
-        if(shaderProgram == 0){
+        if(mBaseShaderProgram == 0){
             throw new RuntimeException("Error creating shader program.");
         }
 
-        mBaseMVPMatrixHandle = GLES20.glGetUniformLocation(shaderProgram,"u_MVPMatrix");
-        mBasePositionHandle = GLES20.glGetAttribLocation(shaderProgram,"a_Position");
-        mBaseColorHandle = GLES20.glGetAttribLocation(shaderProgram,"a_Color");
-
-        GLES20.glUseProgram(shaderProgram);
+        mBaseMVPMatrixHandle = GLES20.glGetUniformLocation(mBaseShaderProgram,"u_MVPMatrix");
+        mBasePositionHandle = GLES20.glGetAttribLocation(mBaseShaderProgram,"a_Position");
 
 
     }
@@ -143,5 +136,23 @@ public class BaseRenderer20 implements GLSurfaceView.Renderer {
         Matrix.rotateM(matrix,0,angleDegreeZ,0,0,1);
     }
 
+    public void drawCoordinates(){
+        GLES20.glUseProgram(mBaseShaderProgram);
+        Matrix.setIdentityM(mBaseModelMatrix,0);
 
+        mBaseMVPMatrixHandle = GLES20.glGetUniformLocation(mBaseShaderProgram,"u_MVPMatrix");
+        mBasePositionHandle = GLES20.glGetAttribLocation(mBaseShaderProgram,"a_Position");
+
+        mBaseVertexFloatBuffer.position(0);
+        GLES20.glVertexAttribPointer(mBasePositionHandle,3,GLES20.GL_FLOAT,false,3*4,mBaseVertexFloatBuffer);
+        GLES20.glEnableVertexAttribArray(mBasePositionHandle);
+
+        //m*v*p
+        Matrix.multiplyMM(mBaseMVPMatrix,0,mBaseViewMatrix,0,mBaseModelMatrix,0);
+        Matrix.multiplyMM(mBaseMVPMatrix,0,mBaseProjectionMatrix,0,mBaseMVPMatrix,0);
+
+        GLES20.glUniformMatrix4fv(mBaseMVPMatrixHandle, 1, false, mBaseMVPMatrix, 0);
+        GLES20.glDrawArrays(GLES20.GL_LINE_LOOP, 0, 5);
+
+    }
 }

@@ -78,12 +78,12 @@ public class OpenGLES20BaseActivity extends AppCompatActivity implements View.On
                 render.angleDegreeZ += (float) (Math.PI/2)*d;
                 break;
             case R.id.btnreset:
-                render.angleDegreeX += 0;
-                render.angleDegreeY += 0;
-                render.angleDegreeZ += 0;
+                render.angleDegreeX = 0;
+                render.angleDegreeY = 0;
+                render.angleDegreeZ = 0;
                 break;
         }
-//        mGLSurfaceView.requestRender();
+        mGLSurfaceView.requestRender();
     }
 
     @Override

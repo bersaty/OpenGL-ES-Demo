@@ -7,5 +7,6 @@
         <item>OpenGLES20LightActivity</item>
         <item>OpenGLES20PointActivity</item>
         <item>OpenGLES20LineActivity</item>
+        <item>OpenGLES20TextureActivity</item>
     </array>
 </resources>

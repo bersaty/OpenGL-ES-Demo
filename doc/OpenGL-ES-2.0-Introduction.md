@@ -27,7 +27,7 @@ OpenGL ES 3.0主要新功能有：
 
 ![](setlookat.png)
 
-通过这个函数设置眼睛和观察的位置，以及眼睛向上的方向。
+通过这个函数设置眼睛和观察的位置，以及眼睛向上的方向。屏幕中间是一个参考点（0，0，0），用这个参考点来设置眼睛的位置。
 
 ```java
 Matrix.setLookAtM(mViewMatrix, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
@@ -41,7 +41,7 @@ left：左边的距离（比例）。
 right：右边的距离（比例）。
 bottom：下边的距离（比例）。
 top：上边的距离（比例）。
-near:和近截面的距离， 眼睛距离>=near>=0。
+near:和近截面的距离。
 far：和远截面的距离，far>near。
 
 ```java

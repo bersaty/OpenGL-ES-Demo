@@ -1,5 +1,5 @@
 # openglDemo
-1、[相关概念](doc/OpenGL-ES-2.0-Introduction.md)  
+1、[简介](doc/OpenGL-ES-2.0-Introduction.md)
 
 2、[三角形的绘制](doc/DrawTriangle.md)
 
@@ -9,4 +9,4 @@
 
 5、[顶点缓冲区对象](doc/Vertex-Buffer-Objects.md)
 
-6、[]()
+6、[参考资料](doc/相关资料.md)

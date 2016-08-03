@@ -79,6 +79,7 @@ public class LineRenderer20 extends BaseRenderer20 {
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+//        super.onSurfaceCreated(gl,config);
         //背景颜色黑色
         GLES20.glClearColor(0, 0, 0, 0);
         // 眼睛的位置
@@ -210,6 +211,8 @@ public class LineRenderer20 extends BaseRenderer20 {
 //        Matrix.rotateM(mModelMatrix, 0, angleInDegrees, 0.0f, 0.0f, 1.0f);
         rotate(mModelMatrix);
         drawLines(mLinesVerticesFloatBuffer);
+
+//        drawCoordinates();
 
     }
 
