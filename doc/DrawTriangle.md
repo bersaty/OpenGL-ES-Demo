@@ -53,23 +53,25 @@ OpenGL 1.0遗留下来的，2.0之后不用使用了。
     }
 ```
 
-在onSurfaceCreateed里面初始化需要做的工作:
-0、初始化数据点
-1、清屏，相当于设置背景颜色，GLES20.glClearColor
-2、初始化相机位置，Matrix.setLookAtM
-3、编写着色器程序，vertexShader和fragmentShader
-4、加载着色器
-5、编译着色器
-6、创建程序
-7、加载上面两个着色器到程序里
-8、将程序设置到GPU运行
-
-
+在Renderer里面所需要做的工作如下：
+0、创建顶点数据,float[] buffer;
+1、初始化顶点缓冲区对象,FloatBuffer;
+2、清屏，相当于设置背景颜色，GLES20.glClearColor;
+3、初始化相机位置，Matrix.setLookAtM;
+4、编写着色器程序，vertexShader和fragmentShader;
+5、加载着色器,GLES20.glShaderSource;
+6、编译着色器,GLES20.glCompileShader;
+7、创建程序,GLES20.glCreateProgram();
+8、连接顶点着色器和片段着色器程序,GLES20.glLinkProgram();
+9、将程序设置到GPU运行,GLES20.glUseProgram();
+10、连接顶点属性，glVertexAttribPointer，glEnableVertexAttribArray；
+11、计算最终的MVPMatrix并将矩阵传递到着色器程序里；
+12、绘制数组内容；
 
 ```java
 
     /**
-     * 初始化顶点数据
+     * 0、创建顶点数据，包括顶点坐标和颜色
      */
     public TriangleRenderer20() {
         // 三角形的颜色红，绿，蓝
@@ -85,7 +87,7 @@ OpenGL 1.0遗留下来的，2.0之后不用使用了。
                 0.0f, 0.559016994f, 0.0f,
                 0.0f, 1.0f, 0.0f, 1.0f};
 
-        // 将顶点数据转化成FloatBuffer
+        // 1、将顶点数据转化成FloatBuffer，这样OpenGL 才能使用
         mTriangle1Vertices = ByteBuffer.allocateDirect(triangle1VerticesData.length * mBytesPerFloat)
                 .order(ByteOrder.nativeOrder()).asFloatBuffer();
         mTriangle1Vertices.put(triangle1VerticesData).position(0);
@@ -93,15 +95,16 @@ OpenGL 1.0遗留下来的，2.0之后不用使用了。
 
         @Override
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        //请屏颜色 4个参数分别对应R，G，B，A（红，绿，蓝，透明度）
+        //2、请屏颜色 4个参数分别对应R，G，B，A（红，绿，蓝，透明度）
         GLES20.glClearColor(0f, 0f, 0f, 0f);
-        // 视图矩阵。相机的位置。
+        // 3、初始化相机位置，相当于眼睛的位置，以及观察的方向。
         // 在OpenGL 1 时使用的是模型矩阵和视图矩阵的组合。在OpenGL 2我们可以使用其中一种。
         // 设置相机的位置，mViewMatrix为返回的结果，rmOffset是矩阵开始的位置，（eyeX, eyeY, eyeZ）为相机的坐标，
         // （lookX, lookY, lookZ）为物体中心的坐标，（upX, upY, upZ）相机向上的坐标，用于固定相机的方向
         Matrix.setLookAtM(mViewMatrix, rmOffset, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
         
         //OpenGL Shader Language,简称GLSL，它是一种类似于C语言的专门为GPU设计的语言，它可以放在GPU里面被并行运行。
+        //4、编写着色器程序。
         final String vertexShader =
                 "uniform mat4 u_MVPMatrix;      \n"        // 这个是4x4的矩阵常量，表示model/view/projection矩阵
 
@@ -116,7 +119,7 @@ OpenGL 1.0遗留下来的，2.0之后不用使用了。
                         // It will be interpolated across the triangle.
                         + "   gl_Position = u_MVPMatrix   \n"    // gl_Position 内部参数用于存储最终的位置参数
                         + "               * a_Position;   \n"     // 通过矩阵相乘计算出顶点在屏幕的最终坐标
-                        + "}                              \n";    // 
+                        + "}                              \n";    //
 
         final String fragmentShader =
                 "precision mediump float;       \n"        // Set the default precision to medium. We don't need as high of a
@@ -128,14 +131,14 @@ OpenGL 1.0遗留下来的，2.0之后不用使用了。
                         + "   gl_FragColor = v_Color;     \n"        // Pass the color directly through the pipeline.
                         + "}                              \n";
 
-        // 加载 vertex shader 返回句柄
+        // 5、加载着色器，加载 vertex shader 返回句柄
         int vertexShaderHandle = GLES20.glCreateShader(GLES20.GL_VERTEX_SHADER);
 
         if (vertexShaderHandle != 0) {
             // 向顶点着色器中添加源码shader source.
             GLES20.glShaderSource(vertexShaderHandle, vertexShader);
 
-            // 编译这个着色器程序
+            // 6、编译vertex shader
             GLES20.glCompileShader(vertexShaderHandle);
 
             // 获取编译结果
@@ -154,14 +157,14 @@ OpenGL 1.0遗留下来的，2.0之后不用使用了。
         }
         }
         
-        // 加载 fragment shader shader.
+        // 5、加载着色器，加载 fragment shader shader.
         int fragmentShaderHandle = GLES20.glCreateShader(GLES20.GL_FRAGMENT_SHADER);
 
         if (fragmentShaderHandle != 0) {
             // Pass in the shader source.
             GLES20.glShaderSource(fragmentShaderHandle, fragmentShader);
 
-            // Compile the shader.
+            // 6、编译fragment shader
             GLES20.glCompileShader(fragmentShaderHandle);
 
             // Get the compilation status.
@@ -179,7 +182,7 @@ OpenGL 1.0遗留下来的，2.0之后不用使用了。
             throw new RuntimeException("Error creating fragment shader.");
         }
         
-        // 创建运行程序，加载上面的句柄
+        // 7、创建运行程序，加载上面的句柄
         int programHandle = GLES20.glCreateProgram();
 
         if (programHandle != 0) {
@@ -193,7 +196,7 @@ OpenGL 1.0遗留下来的，2.0之后不用使用了。
             GLES20.glBindAttribLocation(programHandle, 0, "a_Position");
             GLES20.glBindAttribLocation(programHandle, 1, "a_Color");
 
-            // Link the two shaders together into a program.
+            // 8、连接vertex shader 和 fragment shader
             GLES20.glLinkProgram(programHandle);
 
             // Get the link status.
@@ -217,7 +220,7 @@ OpenGL 1.0遗留下来的，2.0之后不用使用了。
         mPositionHandle = GLES20.glGetAttribLocation(programHandle, "a_Position");
         mColorHandle = GLES20.glGetAttribLocation(programHandle, "a_Color");
 
-        // 告诉OpenGL 使用这个程序渲染
+        // 9、告诉OpenGL 使用这个程序渲染
         GLES20.glUseProgram(programHandle);
 ```
 
@@ -239,14 +242,14 @@ OpenGL 1.0遗留下来的，2.0之后不用使用了。
     }
     
     private void drawTriangle(final FloatBuffer aTriangleBuffer) {
-        // Pass in the position information
+        // 10、连接顶点属性，告诉着色器怎么解析顶点数据
         aTriangleBuffer.position(mPositionOffset);
         GLES20.glVertexAttribPointer(mPositionHandle, mPositionDataSize, GLES20.GL_FLOAT, false,
                 mStrideBytes, aTriangleBuffer);
 
         GLES20.glEnableVertexAttribArray(mPositionHandle);
 
-        // Pass in the color information
+        // 10、连接顶点属性，告诉OpenGL怎么解析颜色数据
         aTriangleBuffer.position(mColorOffset);
         GLES20.glVertexAttribPointer(mColorHandle, mColorDataSize, GLES20.GL_FLOAT, false,
                 mStrideBytes, aTriangleBuffer);
@@ -260,8 +263,10 @@ OpenGL 1.0遗留下来的，2.0之后不用使用了。
         // This multiplies the modelview matrix by the projection matrix, and stores the result in the MVP matrix
         // (which now contains model * view * projection).
         Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVPMatrix, 0);
-
+        
+        //11、将最终的mvp矩阵传递到着色器中
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrix, 0);
+        //12、绘制数组
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3);
     }
 ```
