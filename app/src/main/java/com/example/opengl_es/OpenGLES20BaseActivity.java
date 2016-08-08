@@ -6,6 +6,9 @@ import android.content.pm.ConfigurationInfo;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.AttributeSet;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -20,12 +23,14 @@ import java.util.List;
 public class OpenGLES20BaseActivity extends AppCompatActivity implements View.OnClickListener{
     BaseRenderer20 render;
     Spinner spinner;
-    GLSurfaceView mGLSurfaceView;
+    MySurfaceView mGLSurfaceView;
     boolean supportsEs2;
+
+    float lastX, lastY;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mGLSurfaceView = new GLSurfaceView(this);
+        mGLSurfaceView = new MySurfaceView(this);
         setContentView(R.layout.activity_opengles10);
 
         spinner = (Spinner) findViewById(R.id.spinner);
@@ -100,5 +105,42 @@ public class OpenGLES20BaseActivity extends AppCompatActivity implements View.On
         // The activity must call the GL surface view's onPause() on activity onPause().
         super.onPause();
         mGLSurfaceView.onPause();
+    }
+
+    class MySurfaceView extends GLSurfaceView{
+
+
+        public MySurfaceView(Context context) {
+            super(context);
+        }
+
+        public MySurfaceView(Context context, AttributeSet attrs) {
+            super(context, attrs);
+        }
+
+        @Override
+        public boolean onTouchEvent(MotionEvent event){
+            if(event.getAction() == MotionEvent.ACTION_DOWN){
+                lastX = event.getX();
+                lastY = event.getY();
+            }
+            if(event.getAction() == MotionEvent.ACTION_MOVE){
+                float currentX = event.getX();
+                float currentY = event.getY();
+                if(Math.abs(currentX - lastX) > 10){
+                    render.angleDegreeX += (float) (Math.PI/2)*(currentX - lastX)/10;
+                }
+                if(Math.abs(currentY - lastY) > 10){
+                    render.angleDegreeY += (float) (Math.PI/2)*(currentY - lastY)/10;
+                }
+
+                lastX = currentX;
+                lastY = currentY;
+            }
+
+            Log.i("wch ontouch event ~","~~~~~~~~~");
+            return true;
+        }
+
     }
 }

@@ -344,6 +344,7 @@ public class LightRenderer20 extends BaseRenderer20 {
                         + "   float diffuse = max(dot(modelViewNormal, lightVector), 0.1);       \n"
                         // Attenuate the light based on distance.
                         + "   diffuse = diffuse * (1.0 / (1.0 + (0.25 * distance * distance)));  \n"
+                        //diffuse = diffuse;可以看得清楚些，上面0.1修改大一点
                         // Multiply the color by the illumination level. It will be interpolated across the triangle.
                         + "   v_Color = a_Color * diffuse;                                       \n"
                         // gl_Position is a special variable used to store the final position.
@@ -382,7 +383,7 @@ public class LightRenderer20 extends BaseRenderer20 {
         // Position the eye in front of the origin.
         final float eyeX = 0.0f;
         final float eyeY = 0.0f;
-        final float eyeZ = 1.5f;
+        final float eyeZ = 1.5f;//修改成-2.8f可以看到 cull_face的效果
 
         // We are looking toward the distance
         final float lookX = 0.0f;
@@ -501,7 +502,7 @@ public class LightRenderer20 extends BaseRenderer20 {
 
         Matrix.setIdentityM(mModelMatrix, 0);
         Matrix.translateM(mModelMatrix, 0, 0.0f, 0.0f, -5.0f);
-        Matrix.rotateM(mModelMatrix, 0, 45f, 1.0f, 1.0f, 0.0f);
+        rotate(mModelMatrix);
         drawCube();
 
         // Draw a point to indicate the light.
