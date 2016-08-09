@@ -474,7 +474,7 @@ public class TextureRenderer20 extends BaseRenderer20 {
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
         
         // Bind the texture to this unit.
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureDataHandle);
+//        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureDataHandle);
         
         // Tell the texture uniform sampler to use this texture in the shader by binding to texture unit 0.
         GLES20.glUniform1i(mTextureUniformHandle, 0);        
