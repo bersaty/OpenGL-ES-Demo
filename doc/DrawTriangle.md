@@ -31,8 +31,7 @@ GLSurfaceView是一个载体，相当于画布，需要绘制的内容都在这�
 
 #### 2、创建Renderer
 
-用于渲染，相当于画笔，主要的工作都在Renderer里面完成。Renderer继承GLSurfaceView.Renderer，需要实现三个接口，其中的GL10 参数是
-OpenGL 1.0遗留下来的，2.0之后不用使用了。
+renderer用于渲染，相当于画笔，主要的工作都在Renderer里面完成。Renderer继承GLSurfaceView.Renderer，需要实现三个接口，其中的GL10 参数是OpenGL 1.0遗留下来的，2.0之后不用使用了。
 ```java
     public class TriangleRenderer20 implements GLSurfaceView.Renderer {
 
@@ -54,19 +53,33 @@ OpenGL 1.0遗留下来的，2.0之后不用使用了。
 ```
 
 在Renderer里面所需要做的工作如下：
+
 0、创建顶点数据,float[] buffer;
+
 1、初始化顶点缓冲区对象,FloatBuffer;
+
 2、清屏，相当于设置背景颜色，GLES20.glClearColor;
+
 3、初始化相机位置，Matrix.setLookAtM;
+
 4、编写着色器程序，vertexShader和fragmentShader;
+
 5、加载着色器,GLES20.glShaderSource;
+
 6、编译着色器,GLES20.glCompileShader;
+
 7、创建程序,GLES20.glCreateProgram();
+
 8、连接顶点着色器和片段着色器程序,GLES20.glLinkProgram();
+
 9、将程序设置到GPU运行,GLES20.glUseProgram();
+
 10、连接顶点属性，glVertexAttribPointer，glEnableVertexAttribArray；
+
 11、计算最终的MVPMatrix并将矩阵传递到着色器程序里；
+
 12、绘制数组内容；
+
 
 ```java
 
@@ -224,7 +237,7 @@ OpenGL 1.0遗留下来的，2.0之后不用使用了。
         GLES20.glUseProgram(programHandle);
 ```
 
-最后渲染绘制图形
+最后渲染绘制图形，调用GLES20.glDrawArrays绘制。
 ```java
     @Override
     public void onDrawFrame(GL10 glUnused) {

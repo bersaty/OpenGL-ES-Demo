@@ -8,5 +8,6 @@
         <item>OpenGLES20PointActivity</item>
         <item>OpenGLES20LineActivity</item>
         <item>OpenGLES20TextureActivity</item>
+        <item>WaveTestActivity</item>
     </array>
 </resources>
