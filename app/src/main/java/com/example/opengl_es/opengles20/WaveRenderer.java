@@ -53,11 +53,18 @@ public class WaveRenderer extends BaseRenderer20 {
         // This triangle is red, green, and blue.
         final float[] triangle1VerticesData = {
                 // X, Y, Z,
-                -0.5f, -0.25f, 0.0f,
+                -0.5f, -0.5f, 0.0f,
 
-                0.5f, -0.25f, 0.0f,
+                0.5f, -0.5f, 0.0f,
 
-                0.0f, 0.559016994f, 0.0f};
+                0.5f, 0.5f, 0.0f,
+
+                0.5f, 0.5f, 0.0f,
+
+                -0.5f, -0.5f, 0.0f,
+
+                -0.5f, 0.5f, 0.0f,
+        };
 
         // This triangle is red, green, and blue.
         final float[] triangle1VerticesColorData = {
@@ -71,7 +78,11 @@ public class WaveRenderer extends BaseRenderer20 {
         final float[] triangle1TextureCoordinateData = {
                 0,0,
                 1,0,
-                0.5f,1f,
+                1,1,
+                1,1,
+                0,0,
+                0,1
+
         };
 
         // Initialize the buffers.
@@ -206,6 +217,6 @@ public class WaveRenderer extends BaseRenderer20 {
         Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVPMatrix, 0);
 
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrix, 0);
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3);
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 6);
     }
 }
