@@ -11,6 +11,7 @@ import com.example.opengl_es.utils.MyGLUtils;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+import java.util.Random;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -23,7 +24,7 @@ import javax.microedition.khronos.opengles.GL10;
  * This class implements our custom renderer. Note that the GL10 parameter passed in is unused for OpenGL ES 2.0
  * renderers -- the static class GLES20 is used instead.
  */
-public class WaveRenderer extends BaseRenderer20 {
+public class ShapeAnimatorRenderer extends BaseRenderer20 {
     private float[] mModelMatrix = new float[16];
     private float[] mViewMatrix = new float[16];
     private float[] mProjectionMatrix = new float[16];
@@ -46,7 +47,7 @@ public class WaveRenderer extends BaseRenderer20 {
     private final int mColorDataSize = 4;
 
     private Context mContext;
-    public WaveRenderer(Context context) {
+    public ShapeAnimatorRenderer(Context context) {
 
         mContext = context;
 
@@ -73,15 +74,21 @@ public class WaveRenderer extends BaseRenderer20 {
 
                 0.0f, 0.0f, 1.0f, 1.0f,
 
-                0.0f, 1.0f, 0.0f, 1.0f};
+                0.0f, 1.0f, 0.0f, 1.0f,
+
+                0.0f, 1.0f, 0.0f, 1.0f,
+
+                1.0f, 0.0f, 0.0f, 1.0f,
+
+                0.0f, 0.0f, 1.0f, 1.0f};
 
         final float[] triangle1TextureCoordinateData = {
                 0,0,
-                3,0,
-                3,3,
-                3,3,
+                1,0,
+                1,1,
+                1,1,
                 0,0,
-                0,3
+                0,1
 
         };
 
@@ -124,7 +131,7 @@ public class WaveRenderer extends BaseRenderer20 {
         // view matrix. In OpenGL 2, we can keep track of these matrices separately if we choose.
         Matrix.setLookAtM(mViewMatrix, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
 
-        int programHandle = MyGLUtils.buildProgram(mContext, R.raw.waverender_vs,R.raw.waverender_fs);
+        int programHandle = MyGLUtils.buildProgram(mContext, R.raw.waverender_vs,R.raw.triangles_mosaic);
 
         int textureHandle = MyGLUtils.loadTexture(mContext,R.drawable.foxgirl,new int[2]);
 
@@ -180,7 +187,8 @@ public class WaveRenderer extends BaseRenderer20 {
         Matrix.setIdentityM(mModelMatrix, 0);
 //        Matrix.rotateM(mModelMatrix, 0, angleInDegrees, 0.0f, 0.0f, 1.0f);
         rotate(mModelMatrix);
-        GLES20.glUniform1f(mGlobalTimeHandle,angleInDegrees);
+        Random random = new Random();
+        GLES20.glUniform1f(mGlobalTimeHandle, random.nextFloat());
         drawShape(mTriangle1Vertices,mTriangle1VerticesColor,mTriangle1VerticesTexture);
 
     }

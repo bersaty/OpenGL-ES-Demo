@@ -29,6 +29,7 @@
         <activity android:name=".OpenGLES20LineActivity"></activity>
         <activity android:name=".OpenGLES20TextureActivity"></activity>
         <activity android:name=".WaveTestActivity"></activity>
+        <activity android:name=".ShapeAnimatorActivity"></activity>
     </application>
 
 </manifest>
