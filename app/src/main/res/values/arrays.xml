@@ -10,5 +10,6 @@
         <item>OpenGLES20TextureActivity</item>
         <item>WaveTestActivity</item>
         <item>ShapeAnimatorActivity</item>
+        <item>GeometryAnimationActivity</item>
     </array>
 </resources>

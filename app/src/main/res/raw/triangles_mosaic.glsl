@@ -20,7 +20,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     uv -= uv2;
     uv *= tile_num;
     vec2 delta = vec2(step(1.0-uv.y,uv.x)/(2.0*tile_num.x),step(uv.x,uv.y)/(2.0*tile_num.y));
-	fragColor = texture2D( u_Texture, uv2+delta);
+	fragColor = texture2D( u_Texture, uv2);
 }
 
 void main() {

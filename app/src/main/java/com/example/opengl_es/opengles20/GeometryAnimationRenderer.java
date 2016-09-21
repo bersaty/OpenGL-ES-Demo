@@ -2,6 +2,7 @@ package com.example.opengl_es.opengles20;
 
 import android.content.Context;
 import android.opengl.GLES20;
+import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.os.SystemClock;
 
@@ -11,7 +12,6 @@ import com.example.opengl_es.utils.MyGLUtils;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
-import java.util.Random;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -24,73 +24,54 @@ import javax.microedition.khronos.opengles.GL10;
  * This class implements our custom renderer. Note that the GL10 parameter passed in is unused for OpenGL ES 2.0
  * renderers -- the static class GLES20 is used instead.
  */
-public class ShapeAnimatorRenderer extends BaseRenderer20 {
+public class GeometryAnimationRenderer implements GLSurfaceView.Renderer {
     private float[] mModelMatrix = new float[16];
     private float[] mViewMatrix = new float[16];
     private float[] mProjectionMatrix = new float[16];
     private float[] mMVPMatrix = new float[16];
     private final FloatBuffer mTriangle1Vertices;
     private final FloatBuffer mTriangle1VerticesColor;
-    private final FloatBuffer mTriangle1VerticesTexture;
     private int mMVPMatrixHandle;
     private int mPositionHandle;
     private int mColorHandle;
-    private int mTextureUniformHandle;
-    private int mTextureCoordinationHandle;
-
     private int mGlobalTimeHandle;
-    private final int mBytesPerFloat = 4;
-    private final int mStrideBytes = 7 * mBytesPerFloat;
-    private final int mPositionOffset = 0;
-    private final int mPositionDataSize = 3;
-    private final int mColorOffset = 3;
-    private final int mColorDataSize = 4;
+    private int mResolutionHandle;
 
     private Context mContext;
-    public ShapeAnimatorRenderer(Context context) {
+    public GeometryAnimationRenderer(Context context) {
 
         mContext = context;
 
         // This triangle is red, green, and blue.
         final float[] triangle1VerticesData = {
                 // X, Y, Z,
-                -0.5f, -0.5f, 0.0f,
+                -10f, -10f, 0.0f,
 
-                0.5f, -0.5f, 0.0f,
+                10f, -10f, 0.0f,
 
-                0.5f, 0.5f, 0.0f,
+                10f, 10f, 0.0f,
 
-                0.5f, 0.5f, 0.0f,
+                10f, 10f, 0.0f,
 
-                -0.5f, -0.5f, 0.0f,
+                -10f, -10f, 0.0f,
 
-                -0.5f, 0.5f, 0.0f,
+                -10f, 10f, 0.0f,
         };
 
         // This triangle is red, green, and blue.
         final float[] triangle1VerticesColorData = {
                 // R, G, B, A
-                1.0f, 0.0f, 0.0f, 1.0f,
+                0.32f, 0.48f, 0.98f, 1.0f,
 
-                0.0f, 0.0f, 1.0f, 1.0f,
+                0.32f, 0.48f, 0.98f, 1.0f,
 
-                0.0f, 1.0f, 0.0f, 1.0f,
+                0.32f, 0.48f, 0.98f, 1.0f,
 
-                0.0f, 1.0f, 0.0f, 1.0f,
+                0.32f, 0.48f, 0.98f, 1.0f,
 
-                1.0f, 0.0f, 0.0f, 1.0f,
+                0.32f, 0.48f, 0.98f, 1.0f,
 
-                0.0f, 0.0f, 1.0f, 1.0f};
-
-        final float[] triangle1TextureCoordinateData = {
-                0,0,
-                -1,0,
-                -1,-1,
-                -1,-1,
-                0,0,
-                0,-1
-
-        };
+                0.32f, 0.48f, 0.98f, 1.0f};
 
         // Initialize the buffers.
         mTriangle1Vertices = ByteBuffer.allocateDirect(triangle1VerticesData.length * 4)
@@ -100,10 +81,6 @@ public class ShapeAnimatorRenderer extends BaseRenderer20 {
         mTriangle1VerticesColor = ByteBuffer.allocateDirect(triangle1VerticesColorData.length * 4)
                 .order(ByteOrder.nativeOrder()).asFloatBuffer();
         mTriangle1VerticesColor.put(triangle1VerticesColorData).position(0);
-
-        mTriangle1VerticesTexture = ByteBuffer.allocateDirect(triangle1TextureCoordinateData.length * 4)
-                .order(ByteOrder.nativeOrder()).asFloatBuffer();
-        mTriangle1VerticesTexture.put(triangle1TextureCoordinateData).position(0);
     }
 
     @Override
@@ -114,7 +91,7 @@ public class ShapeAnimatorRenderer extends BaseRenderer20 {
         // Position the eye behind the origin.
         final float eyeX = 0.0f;
         final float eyeY = 0.0f;
-        final float eyeZ = 1.1f;
+        final float eyeZ = 10.0f;
 
         // We are looking toward the distance
         final float lookX = 0.0f;
@@ -131,30 +108,23 @@ public class ShapeAnimatorRenderer extends BaseRenderer20 {
         // view matrix. In OpenGL 2, we can keep track of these matrices separately if we choose.
         Matrix.setLookAtM(mViewMatrix, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
 
-        int programHandle = MyGLUtils.buildProgram(mContext, R.raw.waverender_vs,R.raw.triangles_mosaic);
-
-        int textureHandle = MyGLUtils.loadTexture(mContext,R.drawable.foxgirl,new int[2]);
+        int programHandle = MyGLUtils.buildProgram(mContext, R.raw.geometryanimation_vs,R.raw.geometryanimation_1fs);
 
         // Set program handles. These will later be used to pass in values to the program.
         mMVPMatrixHandle = GLES20.glGetUniformLocation(programHandle, "u_MVPMatrix");
-        mTextureUniformHandle = GLES20.glGetUniformLocation(programHandle,"u_Texture");
         mPositionHandle = GLES20.glGetAttribLocation(programHandle, "a_Position");
         mColorHandle = GLES20.glGetAttribLocation(programHandle, "a_Color");
-        mTextureCoordinationHandle = GLES20.glGetAttribLocation(programHandle,"a_TexCoordinate");
         mGlobalTimeHandle = GLES20.glGetUniformLocation(programHandle,"u_GlobalTime");
-
-
-        // Set the active texture unit to texture unit 0.
-//        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-
-        // Tell the texture uniform sampler to use this texture in the shader by binding to texture unit 0.
-//        GLES20.glUniform1i(mTextureUniformHandle, 0);
+        mResolutionHandle = GLES20.glGetUniformLocation(programHandle,"iResolution");
 
         // Tell OpenGL to use this program when rendering.
         GLES20.glUseProgram(programHandle);
 
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_REPEAT);
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_REPEAT);
+
+        GLES20.glStencilMask(0);
+        GLES20.glStencilFunc(GLES20.GL_EQUAL,1,0Xff);
     }
 
     @Override
@@ -169,7 +139,7 @@ public class ShapeAnimatorRenderer extends BaseRenderer20 {
         final float right = ratio;
         final float bottom = -1.0f;
         final float top = 1.0f;
-        final float near = 1.0f;
+        final float near = 3.0f;
         final float far = 10.0f;
 
         Matrix.frustumM(mProjectionMatrix, 0, left, right, bottom, top, near, far);
@@ -177,19 +147,18 @@ public class ShapeAnimatorRenderer extends BaseRenderer20 {
 
     @Override
     public void onDrawFrame(GL10 glUnused) {
-        GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT | GLES20.GL_COLOR_BUFFER_BIT);
+        GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT | GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_STENCIL_BUFFER_BIT);
 
-        // Do a complete rotation every 10 seconds.
-        long time = SystemClock.uptimeMillis() % 10000L;
-        float angleInDegrees = (360.0f / 10000.0f) * ((int) time);
+        //角度变化时间
+        long time = SystemClock.uptimeMillis() % 150000L;
+        float angleInDegrees = (360.0f / 150000.0f) * ((int) time);
 
         // Draw the triangle facing straight on.
         Matrix.setIdentityM(mModelMatrix, 0);
-//        Matrix.rotateM(mModelMatrix, 0, angleInDegrees, 0.0f, 0.0f, 1.0f);
-        rotate(mModelMatrix);
-        Random random = new Random();
-        GLES20.glUniform1f(mGlobalTimeHandle, angleInDegrees/360);
-        drawShape(mTriangle1Vertices,mTriangle1VerticesColor,mTriangle1VerticesTexture);
+        //传入的GlobalTime这里转化为角度后再传入，直接传时间会不断闪烁
+        GLES20.glUniform1f(mGlobalTimeHandle, angleInDegrees);
+        GLES20.glUniform3fv(mResolutionHandle,1,FloatBuffer.wrap(new float[]{1080f,1920f,1.0f}));
+        drawShape(mTriangle1Vertices,mTriangle1VerticesColor);
 
     }
 
@@ -198,8 +167,7 @@ public class ShapeAnimatorRenderer extends BaseRenderer20 {
      *
      * @param aTriangleBuffer The buffer containing the vertex data.
      */
-    private void drawShape(final FloatBuffer aTriangleBuffer, final FloatBuffer aTriangleBufferClolr,
-                           final FloatBuffer aTriangleBufferTexture) {
+    private void drawShape(final FloatBuffer aTriangleBuffer, final FloatBuffer aTriangleBufferClolr) {
         // Pass in the position information
         aTriangleBuffer.position(0);
         GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false,
@@ -211,10 +179,6 @@ public class ShapeAnimatorRenderer extends BaseRenderer20 {
         GLES20.glVertexAttribPointer(mColorHandle, 4, GLES20.GL_FLOAT, false,
                 4*4, aTriangleBufferClolr);
         GLES20.glEnableVertexAttribArray(mColorHandle);
-
-        aTriangleBufferTexture.position(0);
-        GLES20.glVertexAttribPointer(mTextureCoordinationHandle,2,GLES20.GL_FLOAT,false,2*4,aTriangleBufferTexture);
-        GLES20.glEnableVertexAttribArray(mTextureCoordinationHandle);
 
         // This multiplies the view matrix by the model matrix, and stores the result in the MVP matrix
         // (which currently contains model * view).
