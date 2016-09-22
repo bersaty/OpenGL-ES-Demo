@@ -6,7 +6,7 @@ varying vec2 v_TexCoordinate;
 
 uniform float u_GlobalTime;
 
-vec2 tile_num = vec2(5.0,5.0);
+vec2 tile_num = vec2(50.0,50.0);//横竖分割
 
 //噪点函数
 float snoise(vec2 co){
@@ -20,7 +20,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     uv -= uv2;
     uv *= tile_num;
     vec2 delta = vec2(step(1.0-uv.y,uv.x)/(2.0*tile_num.x),step(uv.x,uv.y)/(2.0*tile_num.y));
-	fragColor = texture2D( u_Texture, uv2);
+	fragColor = texture2D( u_Texture, uv2+delta);
 }
 
 void main() {

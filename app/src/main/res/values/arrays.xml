@@ -8,8 +8,8 @@
         <item>OpenGLES20PointActivity</item>
         <item>OpenGLES20LineActivity</item>
         <item>OpenGLES20TextureActivity</item>
-        <item>WaveTestActivity</item>
-        <item>ShapeAnimatorActivity</item>
+        <item>ColorFilterActivity</item>
+        <item>ShapeFilterActivity</item>
         <item>GeometryAnimationActivity</item>
     </array>
 </resources>

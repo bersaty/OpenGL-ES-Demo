@@ -25,13 +25,13 @@ import javax.microedition.khronos.opengles.GL10;
  * renderers -- the static class GLES20 is used instead.
  */
 public class GeometryAnimationRenderer implements GLSurfaceView.Renderer {
-    private float[] mModelMatrix = new float[16];
+//    private float[] mModelMatrix = new float[16];
     private float[] mViewMatrix = new float[16];
     private float[] mProjectionMatrix = new float[16];
-    private float[] mMVPMatrix = new float[16];
+//    private float[] mMVPMatrix = new float[16];
     private final FloatBuffer mTriangle1Vertices;
     private final FloatBuffer mTriangle1VerticesColor;
-    private int mMVPMatrixHandle;
+//    private int mMVPMatrixHandle;
     private int mPositionHandle;
     private int mColorHandle;
     private int mGlobalTimeHandle;
@@ -108,23 +108,23 @@ public class GeometryAnimationRenderer implements GLSurfaceView.Renderer {
         // view matrix. In OpenGL 2, we can keep track of these matrices separately if we choose.
         Matrix.setLookAtM(mViewMatrix, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
 
-        int programHandle = MyGLUtils.buildProgram(mContext, R.raw.geometryanimation_vs,R.raw.geometryanimation_1fs);
+        int programHandle = MyGLUtils.buildProgram(mContext, R.raw.geometryanimation_vs,R.raw.geometryanimation_fs);
 
         // Set program handles. These will later be used to pass in values to the program.
-        mMVPMatrixHandle = GLES20.glGetUniformLocation(programHandle, "u_MVPMatrix");
+//        mMVPMatrixHandle = GLES20.glGetUniformLocation(programHandle, "u_MVPMatrix");
         mPositionHandle = GLES20.glGetAttribLocation(programHandle, "a_Position");
-        mColorHandle = GLES20.glGetAttribLocation(programHandle, "a_Color");
+//        mColorHandle = GLES20.glGetAttribLocation(programHandle, "a_Color");
         mGlobalTimeHandle = GLES20.glGetUniformLocation(programHandle,"u_GlobalTime");
         mResolutionHandle = GLES20.glGetUniformLocation(programHandle,"iResolution");
 
         // Tell OpenGL to use this program when rendering.
         GLES20.glUseProgram(programHandle);
 
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_REPEAT);
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_REPEAT);
+//        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_REPEAT);
+//        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_REPEAT);
 
-        GLES20.glStencilMask(0);
-        GLES20.glStencilFunc(GLES20.GL_EQUAL,1,0Xff);
+//        GLES20.glStencilMask(0);
+//        GLES20.glStencilFunc(GLES20.GL_EQUAL,1,0Xff);
     }
 
     @Override
@@ -154,12 +154,11 @@ public class GeometryAnimationRenderer implements GLSurfaceView.Renderer {
         float angleInDegrees = (360.0f / 150000.0f) * ((int) time);
 
         // Draw the triangle facing straight on.
-        Matrix.setIdentityM(mModelMatrix, 0);
+//        Matrix.setIdentityM(mModelMatrix, 0);
         //传入的GlobalTime这里转化为角度后再传入，直接传时间会不断闪烁
         GLES20.glUniform1f(mGlobalTimeHandle, angleInDegrees);
-        GLES20.glUniform3fv(mResolutionHandle,1,FloatBuffer.wrap(new float[]{1080f,1920f,1.0f}));
+//        GLES20.glUniform3fv(mResolutionHandle,1,FloatBuffer.wrap(new float[]{1080f,1920f,1.0f}));
         drawShape(mTriangle1Vertices,mTriangle1VerticesColor);
-
     }
 
     /**
@@ -175,20 +174,20 @@ public class GeometryAnimationRenderer implements GLSurfaceView.Renderer {
         GLES20.glEnableVertexAttribArray(mPositionHandle);
 
         // Pass in the color information
-        aTriangleBufferClolr.position(0);
-        GLES20.glVertexAttribPointer(mColorHandle, 4, GLES20.GL_FLOAT, false,
-                4*4, aTriangleBufferClolr);
-        GLES20.glEnableVertexAttribArray(mColorHandle);
+//        aTriangleBufferClolr.position(0);
+//        GLES20.glVertexAttribPointer(mColorHandle, 4, GLES20.GL_FLOAT, false,
+//                4*4, aTriangleBufferClolr);
+//        GLES20.glEnableVertexAttribArray(mColorHandle);
 
-        // This multiplies the view matrix by the model matrix, and stores the result in the MVP matrix
-        // (which currently contains model * view).
-        Matrix.multiplyMM(mMVPMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
-
-        // This multiplies the modelview matrix by the projection matrix, and stores the result in the MVP matrix
-        // (which now contains model * view * projection).
-        Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVPMatrix, 0);
-
-        GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrix, 0);
+//        // This multiplies the view matrix by the model matrix, and stores the result in the MVP matrix
+//        // (which currently contains model * view).
+//        Matrix.multiplyMM(mMVPMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
+//
+//        // This multiplies the modelview matrix by the projection matrix, and stores the result in the MVP matrix
+//        // (which now contains model * view * projection).
+//        Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVPMatrix, 0);
+//
+//        GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrix, 0);
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 6);
     }
 }

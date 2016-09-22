@@ -16,6 +16,7 @@
         <ImageView
             android:layout_width="310dp"
             android:layout_height="310dp"
+            android:visibility="invisible"
             android:src="@drawable/music"
             android:id="@+id/imageView"
             android:layout_gravity="center_horizontal|bottom" />

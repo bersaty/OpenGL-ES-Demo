@@ -23,7 +23,7 @@ import javax.microedition.khronos.opengles.GL10;
  * This class implements our custom renderer. Note that the GL10 parameter passed in is unused for OpenGL ES 2.0
  * renderers -- the static class GLES20 is used instead.
  */
-public class WaveRenderer extends BaseRenderer20 {
+public class ColorFilterRenderer extends BaseRenderer20 {
     private float[] mModelMatrix = new float[16];
     private float[] mViewMatrix = new float[16];
     private float[] mProjectionMatrix = new float[16];
@@ -46,7 +46,7 @@ public class WaveRenderer extends BaseRenderer20 {
     private final int mColorDataSize = 4;
 
     private Context mContext;
-    public WaveRenderer(Context context) {
+    public ColorFilterRenderer(Context context) {
 
         mContext = context;
 
