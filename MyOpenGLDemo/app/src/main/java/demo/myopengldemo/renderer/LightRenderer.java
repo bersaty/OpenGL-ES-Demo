@@ -344,7 +344,7 @@ public class LightRenderer implements GLSurfaceView.Renderer {
                         + "   diffuse = diffuse * (1.0 / (1.0 + (0.25 * distance * distance)));  \n"
                         //diffuse = diffuse;可以看得清楚些，上面0.1修改大一点
                         // Multiply the color by the illumination level. It will be interpolated across the triangle.
-                        + "   v_Color = a_Color * diffuse;                                       \n"
+                        + "   v_Color = a_Color * 0.6;//v_Color = a_Color * diffuse;                                       \n"
                         // gl_Position is a special variable used to store the final position.
                         // Multiply the vertex by the matrix to get the final point in normalized screen coordinates.
                         + "   gl_Position = u_MVPMatrix * a_Position;                            \n"
@@ -434,13 +434,15 @@ public class LightRenderer implements GLSurfaceView.Renderer {
         final float bottom = -1.0f;
         final float top = 1.0f;
         final float near = 1.0f;
-        final float far = 10.0f;
+        final float far = 100.0f;
 
         Matrix.frustumM(mProjectionMatrix, 0, left, right, bottom, top, near, far);
     }
 
     @Override
     public void onDrawFrame(GL10 glUnused) {
+        Matrix.setLookAtM(mViewMatrix,0,eyeX,eyeY,eyeZ,lookX,lookY,lookZ,upX,upY,upZ);
+
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
         // Do a complete rotation every 10 seconds.
