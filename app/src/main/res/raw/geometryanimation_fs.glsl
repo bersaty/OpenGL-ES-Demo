@@ -92,8 +92,33 @@ void trangle(out vec4 fragColor,in vec4 fragCoord){
 	fragColor=vec4(result.r,result.g,result.b,1.0);
 }
 
+float circle(vec2 p , vec2 o ){
+	p-=o;
+	return length(p);
+
+}
+
+void mainImage(out vec4 fragColor, in vec4 fragCoord)
+{
+    float degree = 90.0;
+	vec2 p = fragCoord.xy / iResolution.y;
+	p.x-= iResolution.x / iResolution.y*0.5;
+	p.y-=0.5;
+
+	float v = 1.0;
+
+		float sint = sin(u_GlobalTime / 20.0);
+
+	float c = circle(p*sint*0.5  , vec2(cos(degree*v)/5.0, sin(degree*v)/5.0));
+	c*= circle(p , vec2(cos(degree*v/3.)/8.,sin(degree*v/3.)/8.));
+
+	fragColor = vec4( (1.0-vec3( c*50. )*vec3(0.5,0.2,0.8))*50.0, 1.0 );
+}
+
 void main(void)
 {
-    retangle(gl_FragColor);
+//    retangle(gl_FragColor);
 //    trangle(gl_FragColor,gl_FragCoord);
+
+mainImage(gl_FragColor,gl_FragCoord);
 }
