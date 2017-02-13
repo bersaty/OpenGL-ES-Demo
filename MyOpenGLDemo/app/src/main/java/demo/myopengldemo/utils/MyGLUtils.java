@@ -24,9 +24,13 @@ import android.opengl.GLES20;
 import android.opengl.GLUtils;
 import android.util.Log;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 
 import javax.microedition.khronos.opengles.GL10;
 
@@ -183,5 +187,73 @@ public class MyGLUtils {
         }
 
         return str;
+    }
+
+    /**
+     * 通过inputStream转换乘BufferReader
+     * @param inputStream
+     * @return
+     */
+    public static BufferedReader getBufferedReaderFrom(InputStream inputStream) {
+        DataInputStream dataInputStream = new DataInputStream(inputStream);
+        InputStreamReader inputStreamReader = new InputStreamReader(dataInputStream);
+        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+        return bufferedReader;
+    }
+
+    /**
+     * 加载obj文件至数组，包括顶点坐标、顶点法向量和纹理坐标
+     * 返回的数组在使用glVertexAttribPointer函数时注意利用stride参数
+     * @return
+     */
+    public static float[] loadObjFromAssets(Context context,String objFileName) {
+        ArrayList<Float> vertexList = new ArrayList<Float>();
+        ArrayList<Float> textureList = new ArrayList<Float>();
+        ArrayList<Float> normalList = new ArrayList<Float>();
+        ArrayList<Float> faceList = new ArrayList<Float>();
+        try {
+            InputStream is = context.getAssets().open(objFileName);
+            BufferedReader br = getBufferedReaderFrom(is);
+            String line = null;
+            while ((line = br.readLine()) != null) {
+                String[] temp = line.split("[ ]+");
+                if (temp[0].trim().equals("v")) {
+                    vertexList.add(Float.parseFloat(temp[1]));
+                    vertexList.add(Float.parseFloat(temp[2]));
+                    vertexList.add(Float.parseFloat(temp[3]));
+                } else if (temp[0].trim().equals("vn")) {
+                    normalList.add(Float.parseFloat(temp[1]));
+                    normalList.add(Float.parseFloat(temp[2]));
+                    normalList.add(Float.parseFloat(temp[3]));
+                } else if (temp[0].trim().equals("vt")) {
+                    textureList.add(Float.parseFloat(temp[1]));
+                    textureList.add(Float.parseFloat(temp[2]));
+                } else if (temp[0].trim().equals("f")) {
+                    for (int i = 1; i < temp.length; i++) {
+                        String[] temp2 = temp[i].split("/");
+                        int indexVetex = Integer.parseInt(temp2[0]) - 1;
+                        faceList.add(vertexList.get(3 * indexVetex));
+                        faceList.add(vertexList.get(3 * indexVetex + 1));
+                        faceList.add(vertexList.get(3 * indexVetex + 2));
+                        int indexNormal = Integer.parseInt(temp2[1]) - 1;
+                        faceList.add(normalList.get(3 * indexNormal));
+                        faceList.add(normalList.get(3 * indexNormal + 1));
+                        faceList.add(normalList.get(3 * indexNormal + 2));
+                        int indexTexture = Integer.parseInt(temp2[2]) - 1;
+                        faceList.add(textureList.get(3 * indexTexture));
+                        faceList.add(textureList.get(3 * indexTexture + 1));
+                        faceList.add(textureList.get(3 * indexTexture + 2));
+                    }
+                }
+            }
+            float [] result = new float[faceList.size()];
+            for (int i = 0; i < faceList.size(); i++) {
+                result[i] = faceList.get(i);
+            }
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

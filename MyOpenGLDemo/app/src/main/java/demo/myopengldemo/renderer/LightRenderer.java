@@ -4,7 +4,6 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.os.SystemClock;
-import android.util.Log;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -344,7 +343,8 @@ public class LightRenderer implements GLSurfaceView.Renderer {
                         + "   diffuse = diffuse * (1.0 / (1.0 + (0.25 * distance * distance)));  \n"
                         //diffuse = diffuse;可以看得清楚些，上面0.1修改大一点
                         // Multiply the color by the illumination level. It will be interpolated across the triangle.
-                        + "   v_Color = a_Color * 0.6;//v_Color = a_Color * diffuse;                                       \n"
+                        + "   v_Color = a_Color * 0.6;"
+                        + "   //v_Color = a_Color * diffuse;                                       \n"
                         // gl_Position is a special variable used to store the final position.
                         // Multiply the vertex by the matrix to get the final point in normalized screen coordinates.
                         + "   gl_Position = u_MVPMatrix * a_Position;                            \n"
@@ -461,10 +461,6 @@ public class LightRenderer implements GLSurfaceView.Renderer {
         mNormalHandle = GLES20.glGetAttribLocation(mPerVertexProgramHandle, "a_Normal");
 
         // Calculate position of the light. Rotate and then push into the distance.
-        Matrix.setIdentityM(mLightModelMatrix, 0);
-        Matrix.translateM(mLightModelMatrix, 0, 0.0f, 2.0f, -3.0f);
-//        Matrix.rotateM(mLightModelMatrix, 0, 0, 0.0f, 1.0f, 0.0f);
-//        Matrix.translateM(mLightModelMatrix, 0, 0.0f, 0.0f, 2.0f);
 
         Matrix.multiplyMV(mLightPosInWorldSpace, 0, mLightModelMatrix, 0, mLightPosInModelSpace, 0);
         Matrix.multiplyMV(mLightPosInEyeSpace, 0, mViewMatrix, 0, mLightPosInWorldSpace, 0);
@@ -496,6 +492,11 @@ public class LightRenderer implements GLSurfaceView.Renderer {
 
         // Draw a point to indicate the light.
         GLES20.glUseProgram(mPointProgramHandle);
+        Matrix.setIdentityM(mLightModelMatrix, 0);
+        Matrix.translateM(mLightModelMatrix, 0, 0.0f, 0.0f, -5.0f);
+        Matrix.rotateM(mLightModelMatrix, 0, angleInDegrees, 0.0f, 1.0f, 0.0f);
+        Matrix.translateM(mLightModelMatrix, 0, 0.0f, 0.0f, 2.0f);
+
         drawLight();
     }
 
@@ -567,108 +568,4 @@ public class LightRenderer implements GLSurfaceView.Renderer {
         GLES20.glDrawArrays(GLES20.GL_POINTS, 0, 1);
     }
 
-    /**
-     * Helper function to compile a shader.
-     *
-     * @param shaderType   The shader type.
-     * @param shaderSource The shader source code.
-     * @return An OpenGL handle to the shader.
-     */
-    private int compileShader(final int shaderType, final String shaderSource) {
-        int shaderHandle = GLES20.glCreateShader(shaderType);
-
-        if (shaderHandle != 0) {
-            // Pass in the shader source.
-            GLES20.glShaderSource(shaderHandle, shaderSource);
-
-            // Compile the shader.
-            GLES20.glCompileShader(shaderHandle);
-
-            // Get the compilation status.
-            final int[] compileStatus = new int[1];
-            GLES20.glGetShaderiv(shaderHandle, GLES20.GL_COMPILE_STATUS, compileStatus, 0);
-
-            // If the compilation failed, delete the shader.
-            if (compileStatus[0] == 0) {
-                Log.e(TAG, "Error compiling shader: " + GLES20.glGetShaderInfoLog(shaderHandle));
-                GLES20.glDeleteShader(shaderHandle);
-                shaderHandle = 0;
-            }
-        }
-
-        if (shaderHandle == 0) {
-            throw new RuntimeException("Error creating shader.");
-        }
-
-        return shaderHandle;
-    }
-
-    /**
-     * Helper function to compile and link a program.
-     *
-     * @param vertexShaderHandle   An OpenGL handle to an already-compiled vertex shader.
-     * @param fragmentShaderHandle An OpenGL handle to an already-compiled fragment shader.
-     * @param attributes           Attributes that need to be bound to the program.
-     * @return An OpenGL handle to the program.
-     */
-    private int createAndLinkProgram(final int vertexShaderHandle, final int fragmentShaderHandle, final String[] attributes) {
-        int programHandle = GLES20.glCreateProgram();
-
-        if (programHandle != 0) {
-            // Bind the vertex shader to the program.
-            GLES20.glAttachShader(programHandle, vertexShaderHandle);
-
-            // Bind the fragment shader to the program.
-            GLES20.glAttachShader(programHandle, fragmentShaderHandle);
-
-            // Bind attributes
-            if (attributes != null) {
-                final int size = attributes.length;
-                for (int i = 0; i < size; i++) {
-                    GLES20.glBindAttribLocation(programHandle, i, attributes[i]);
-                }
-            }
-
-            // Link the two shaders together into a program.
-            GLES20.glLinkProgram(programHandle);
-
-            // Get the link status.
-            final int[] linkStatus = new int[1];
-            GLES20.glGetProgramiv(programHandle, GLES20.GL_LINK_STATUS, linkStatus, 0);
-
-            // If the link failed, delete the program.
-            if (linkStatus[0] == 0) {
-                Log.e(TAG, "Error compiling program: " + GLES20.glGetProgramInfoLog(programHandle));
-                GLES20.glDeleteProgram(programHandle);
-                programHandle = 0;
-            }
-        }
-
-        if (programHandle == 0) {
-            throw new RuntimeException("Error creating program.");
-        }
-
-        return programHandle;
-    }
-
-
-    //改变相机的位置
-    public void changeCamera(float eyeX, float eyeY, float eyeZ, float lookX, float lookY, float lookZ, float upX, float upY, float upZ){
-//        // Position the eye in front of the origin.
-//        final float eyeX = 0.0f;
-//        final float eyeY = 0.0f;
-//        final float eyeZ = 1.5f;//修改成-2.8f可以看到 cull_face的效果
-//
-//        // We are looking toward the distance
-//        final float lookX = 0.0f;
-//        final float lookY = 0.0f;
-//        final float lookZ = -10.0f;
-//
-//        // Set our up vector. This is where our head would be pointing were we holding the camera.
-//        final float upX = 0.0f;
-//        final float upY = 1.0f;
-//        final float upZ = 0.0f;
-
-        Matrix.setLookAtM(mViewMatrix,0,eyeX,eyeY,eyeZ,lookX,lookY,lookZ,upX,upY,upZ);
-    }
 }

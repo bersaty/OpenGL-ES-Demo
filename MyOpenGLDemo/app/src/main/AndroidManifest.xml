@@ -33,6 +33,15 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".activity.LoadObjActivity"
+            android:label="加载obj文件"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="opengldemo" />
+            </intent-filter>
+        </activity>
+
         <activity android:name=".activity.MainActivity"
             android:label="MainActivity"
             >
