@@ -25,7 +25,7 @@
         </activity>
 
         <activity android:name=".activity.LightDemoActivity"
-            android:label="光源设置"
+            android:label="相机位置移动"
             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -52,7 +52,25 @@
         </activity>
 
         <activity android:name=".shadow.ShadowsActivity"
-            android:label="阴影"
+            android:label="阴影1"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="opengldemo" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".sample42.Sample4_2_Activity"
+            android:label="阴影2"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="opengldemo" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".sample81.Sample8_1_Activity"
+            android:label="射线拾取"
             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

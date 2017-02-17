@@ -346,7 +346,7 @@ public class ShadowsRenderer implements GLSurfaceView.Renderer {
         
         // Cull front faces for shadow generation to avoid self shadowing
      	GLES20.glCullFace(GLES20.GL_FRONT);
-        
+
      	renderShadowMap();
      	
         //------------------------- render scene ------------------------------
@@ -370,8 +370,7 @@ public class ShadowsRenderer implements GLSurfaceView.Renderer {
     	// bind the generated framebuffer
     	GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, fboId[0]);
     	
-		GLES20.glViewport(0, 0, mShadowMapWidth,
-								mShadowMapHeight);
+//		GLES20.glViewport(0, 0, mShadowMapWidth, mShadowMapHeight);
 		
 		// Clear color and buffers
 		GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -380,7 +379,7 @@ public class ShadowsRenderer implements GLSurfaceView.Renderer {
 		// Start using the shader
 		GLES20.glUseProgram(mDepthMapProgram.getProgram());
 
-		float[] tempResultMatrix = new float[16];
+//		float[] tempResultMatrix = new float[16];
 		
 		// Calculate matrices for standing objects
 		
@@ -388,30 +387,30 @@ public class ShadowsRenderer implements GLSurfaceView.Renderer {
 		Matrix.multiplyMM(mLightMvpMatrix_staticShapes, 0, mLightViewMatrix, 0, mModelMatrix, 0);
 
 		// Model * view * projection matrix stored and copied for use at rendering from camera point of view
-		Matrix.multiplyMM(tempResultMatrix, 0, mLightProjectionMatrix, 0, mLightMvpMatrix_staticShapes, 0);
-		System.arraycopy(tempResultMatrix, 0, mLightMvpMatrix_staticShapes, 0, 16);
+		Matrix.multiplyMM(mLightMvpMatrix_staticShapes, 0, mLightProjectionMatrix, 0, mLightMvpMatrix_staticShapes, 0);
+//		System.arraycopy(tempResultMatrix, 0, mLightMvpMatrix_staticShapes, 0, 16);
 		
 		// Pass in the combined matrix.
 		GLES20.glUniformMatrix4fv(shadow_mvpMatrixUniform, 1, false, mLightMvpMatrix_staticShapes, 0);
 
 		// Render all stationary shapes on scene
 		mPlane.render(shadow_positionAttribute, 0, 0, true);
-		mSmallCube0.render(shadow_positionAttribute, 0, 0, true);
-		mSmallCube1.render(shadow_positionAttribute, 0, 0, true);
-		mSmallCube2.render(shadow_positionAttribute, 0, 0, true);
-		mSmallCube3.render(shadow_positionAttribute, 0, 0, true);
+//		mSmallCube0.render(shadow_positionAttribute, 0, 0, true);
+//		mSmallCube1.render(shadow_positionAttribute, 0, 0, true);
+//		mSmallCube2.render(shadow_positionAttribute, 0, 0, true);
+//		mSmallCube3.render(shadow_positionAttribute, 0, 0, true);
 		
 		// Calculate matrices for moving objects
 		
 		// Rotate the model matrix with current rotation matrix
-		Matrix.multiplyMM(tempResultMatrix, 0, mModelMatrix, 0, mCubeRotation, 0);
+		Matrix.multiplyMM(mLightMvpMatrix_dynamicShapes, 0, mModelMatrix, 0, mCubeRotation, 0);
 		
 		// View matrix * Model matrix value is stored
-		Matrix.multiplyMM(mLightMvpMatrix_dynamicShapes, 0, mLightViewMatrix, 0, tempResultMatrix, 0);
+		Matrix.multiplyMM(mLightMvpMatrix_dynamicShapes, 0, mLightViewMatrix, 0, mLightMvpMatrix_dynamicShapes, 0);
 
 		// Model * view * projection matrix stored and copied for use at rendering from camera point of view
-		Matrix.multiplyMM(tempResultMatrix, 0, mLightProjectionMatrix, 0, mLightMvpMatrix_dynamicShapes, 0);
-		System.arraycopy(tempResultMatrix, 0, mLightMvpMatrix_dynamicShapes, 0, 16);
+		Matrix.multiplyMM(mLightMvpMatrix_dynamicShapes, 0, mLightProjectionMatrix, 0, mLightMvpMatrix_dynamicShapes, 0);
+//		System.arraycopy(tempResultMatrix, 0, mLightMvpMatrix_dynamicShapes, 0, 16);
 		
 		// Pass in the combined matrix.
 		GLES20.glUniformMatrix4fv(shadow_mvpMatrixUniform, 1, false, mLightMvpMatrix_dynamicShapes, 0);

@@ -343,8 +343,7 @@ public class LightRenderer implements GLSurfaceView.Renderer {
                         + "   diffuse = diffuse * (1.0 / (1.0 + (0.25 * distance * distance)));  \n"
                         //diffuse = diffuse;可以看得清楚些，上面0.1修改大一点
                         // Multiply the color by the illumination level. It will be interpolated across the triangle.
-                        + "   v_Color = a_Color * 0.6;"
-                        + "   //v_Color = a_Color * diffuse;                                       \n"
+                        + "   v_Color = a_Color * diffuse * 1.0;                                       \n"
                         // gl_Position is a special variable used to store the final position.
                         // Multiply the vertex by the matrix to get the final point in normalized screen coordinates.
                         + "   gl_Position = u_MVPMatrix * a_Position;                            \n"
