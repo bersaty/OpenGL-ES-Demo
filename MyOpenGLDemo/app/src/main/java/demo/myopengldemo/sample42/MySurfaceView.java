@@ -10,39 +10,39 @@ import javax.microedition.khronos.opengles.GL10;
 
 class MySurfaceView extends GLSurfaceView
 {
-	private final float TOUCH_SCALE_FACTOR = 180.0f/320;//½Ç¶ÈËõ·Å±ÈÀı
-    private SceneRenderer mRenderer;//³¡¾°äÖÈ¾Æ÷    
+	private final float TOUCH_SCALE_FACTOR = 180.0f/320;//è§’åº¦ç¼©æ”¾æ¯”ä¾‹
+    private SceneRenderer mRenderer;//åœºæ™¯æ¸²æŸ“å™¨    
     
-    private float mPreviousY;//ÉÏ´ÎµÄ´¥¿ØÎ»ÖÃY×ø±ê
-    private float mPreviousX;//ÉÏ´ÎµÄ´¥¿ØÎ»ÖÃX×ø±ê
-	//¹ØÓÚÉãÏñ»úµÄ±äÁ¿
-	float cx=0;//ÉãÏñ»úxÎ»ÖÃ
-	float cy=0;//ÉãÏñ»úyÎ»ÖÃ
-	float cz=60;//ÉãÏñ»úzÎ»ÖÃ
+    private float mPreviousY;//ä¸Šæ¬¡çš„è§¦æ§ä½ç½®Yåæ ‡
+    private float mPreviousX;//ä¸Šæ¬¡çš„è§¦æ§ä½ç½®Xåæ ‡
+	//å…³äºæ‘„åƒæœºçš„å˜é‡
+	float cx=0;//æ‘„åƒæœºxä½ç½®
+	float cy=0;//æ‘„åƒæœºyä½ç½®
+	float cz=60;//æ‘„åƒæœºzä½ç½®
 	
-	float tx=0;//Ä¿±êµãxÎ»ÖÃ
-	float ty=0;//Ä¿±êµãyÎ»ÖÃ
-	float tz=0;//Ä¿±êµãzÎ»ÖÃ
-	public float currSightDis=60;//ÉãÏñ»úºÍÄ¿±êµÄ¾àÀë
-	float angdegElevation=30;//Ñö½Ç
-	public float angdegAzimuth=180;//·½Î»½Ç
+	float tx=0;//ç›®æ ‡ç‚¹xä½ç½®
+	float ty=0;//ç›®æ ‡ç‚¹yä½ç½®
+	float tz=0;//ç›®æ ‡ç‚¹zä½ç½®
+	public float currSightDis=60;//æ‘„åƒæœºå’Œç›®æ ‡çš„è·ç¦»
+	float angdegElevation=30;//ä»°è§’
+	public float angdegAzimuth=180;//æ–¹ä½è§’
 	
-	//¹ØÓÚµÆ¹âµÄ±äÁ¿
-	float lx=0;//xÎ»ÖÃ
-	float ly=0;//yÎ»ÖÃ
-	float lz=0;//zÎ»ÖÃ
+	//å…³äºç¯å…‰çš„å˜é‡
+	float lx=0;//xä½ç½®
+	float ly=0;//yä½ç½®
+	float lz=0;//zä½ç½®
 	float lightDis=100;
-	float lightElevation=40;//µÆ¹âÑö½Ç
-	public float lightAzimuth=180;//µÆ¹âµÄ·½Î»½Ç	
+	float lightElevation=40;//ç¯å…‰ä»°è§’
+	public float lightAzimuth=180;//ç¯å…‰çš„æ–¹ä½è§’	
 	public MySurfaceView(Context context) {
         super(context);
-        this.setEGLContextClientVersion(2); //ÉèÖÃÊ¹ÓÃOPENGL ES2.0
-        mRenderer = new SceneRenderer();	//´´½¨³¡¾°äÖÈ¾Æ÷
-        setRenderer(mRenderer);				//ÉèÖÃäÖÈ¾Æ÷		        
-        setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);//ÉèÖÃäÖÈ¾Ä£Ê½ÎªÖ÷¶¯äÖÈ¾
+        this.setEGLContextClientVersion(2); //è®¾ç½®ä½¿ç”¨OPENGL ES2.0
+        mRenderer = new SceneRenderer();	//åˆ›å»ºåœºæ™¯æ¸²æŸ“å™¨
+        setRenderer(mRenderer);				//è®¾ç½®æ¸²æŸ“å™¨		        
+        setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);//è®¾ç½®æ¸²æŸ“æ¨¡å¼ä¸ºä¸»åŠ¨æ¸²æŸ“
     }
 	
-	//´¥ÃşÊÂ¼ş»Øµ÷·½·¨
+	//è§¦æ‘¸äº‹ä»¶å›è°ƒæ–¹æ³•
     @Override
     public boolean onTouchEvent(MotionEvent e)
     {
@@ -50,41 +50,41 @@ class MySurfaceView extends GLSurfaceView
         float x = e.getX();
         switch (e.getAction()) {
         case MotionEvent.ACTION_MOVE:
-            float dy = y - mPreviousY;//¼ÆËã´¥¿Ø±ÊYÎ»ÒÆ
-            float dx = x - mPreviousX;//¼ÆËã´¥¿Ø±ÊXÎ»ÒÆ
-            angdegAzimuth += dx * TOUCH_SCALE_FACTOR;//ÉèÖÃÑØxÖáĞı×ª½Ç¶È
-            angdegElevation += dy * TOUCH_SCALE_FACTOR;//ÉèÖÃÑØzÖáĞı×ª½Ç¶È
-            //½«Ñö½ÇÏŞÖÆÔÚ5¡«90¶È·¶Î§ÄÚ
+            float dy = y - mPreviousY;//è®¡ç®—è§¦æ§ç¬”Yä½ç§»
+            float dx = x - mPreviousX;//è®¡ç®—è§¦æ§ç¬”Xä½ç§»
+            angdegAzimuth += dx * TOUCH_SCALE_FACTOR;//è®¾ç½®æ²¿xè½´æ—‹è½¬è§’åº¦
+            angdegElevation += dy * TOUCH_SCALE_FACTOR;//è®¾ç½®æ²¿zè½´æ—‹è½¬è§’åº¦
+            //å°†ä»°è§’é™åˆ¶åœ¨5ï½90åº¦èŒƒå›´å†…
             angdegElevation = Math.max(angdegElevation, 5);
             angdegElevation = Math.min(angdegElevation, 90);
-            //ÉèÖÃÉãÏñ»úµÄÎ»ÖÃ
+            //è®¾ç½®æ‘„åƒæœºçš„ä½ç½®
             setCameraPostion();
         }
-        mPreviousY = y;//¼ÇÂ¼´¥¿Ø±ÊÎ»ÖÃ
-        mPreviousX = x;//¼ÇÂ¼´¥¿Ø±ÊÎ»ÖÃ
+        mPreviousY = y;//è®°å½•è§¦æ§ç¬”ä½ç½®
+        mPreviousX = x;//è®°å½•è§¦æ§ç¬”ä½ç½®
         return true;
     }
-    // ÉèÖÃÉãÏñ»úÎ»ÖÃµÄ·½·¨
+    // è®¾ç½®æ‘„åƒæœºä½ç½®çš„æ–¹æ³•
 	public void setCameraPostion() {
-		//¼ÆËãÉãÏñ»úµÄÎ»ÖÃ
-		double angradElevation = Math.toRadians(angdegElevation);// Ñö½Ç£¨»¡¶È£©
-		double angradAzimuth = Math.toRadians(angdegAzimuth);// ·½Î»½Ç
+		//è®¡ç®—æ‘„åƒæœºçš„ä½ç½®
+		double angradElevation = Math.toRadians(angdegElevation);// ä»°è§’ï¼ˆå¼§åº¦ï¼‰
+		double angradAzimuth = Math.toRadians(angdegAzimuth);// æ–¹ä½è§’
 		cx = (float) (tx - currSightDis * Math.cos(angradElevation)	* Math.sin(angradAzimuth));
 		cy = (float) (ty + currSightDis * Math.sin(angradElevation));
 		cz = (float) (tz - currSightDis * Math.cos(angradElevation) * Math.cos(angradAzimuth));
 	}
-	// Î»ÖÃµÆ¹âÎ»ÖÃµÄ·½·¨
+	// ä½ç½®ç¯å…‰ä½ç½®çš„æ–¹æ³•
 	public void setLightPostion() {
-		//¼ÆËãµÆ¹âµÄÎ»ÖÃ
-		double angradElevation = Math.toRadians(lightElevation);// Ñö½Ç£¨»¡¶È£©
-		double angradAzimuth = Math.toRadians(lightAzimuth);// ·½Î»½Ç
+		//è®¡ç®—ç¯å…‰çš„ä½ç½®
+		double angradElevation = Math.toRadians(lightElevation);// ä»°è§’ï¼ˆå¼§åº¦ï¼‰
+		double angradAzimuth = Math.toRadians(lightAzimuth);// æ–¹ä½è§’
 		lx = (float) (- lightDis * Math.cos(angradElevation)	* Math.sin(angradAzimuth));
 		ly = (float) (+ lightDis * Math.sin(angradElevation));
 		lz = (float) (- lightDis * Math.cos(angradElevation) * Math.cos(angradAzimuth));
 	}
 	private class SceneRenderer implements GLSurfaceView.Renderer
     {
-    	//´ÓÖ¸¶¨µÄobjÎÄ¼şÖĞ¼ÓÔØ¶ÔÏó
+    	//ä»æŒ‡å®šçš„objæ–‡ä»¶ä¸­åŠ è½½å¯¹è±¡
 		LoadedObjectVertexNormalFace pm;
 		LoadedObjectVertexNormalFace cft;
 		LoadedObjectVertexNormalAverage qt;
@@ -93,52 +93,53 @@ class MySurfaceView extends GLSurfaceView
     	
         public void onDrawFrame(GL10 gl)
         { 
-        	//Çå³ıÉî¶È»º³åÓëÑÕÉ«»º³å
+        	//æ¸…é™¤æ·±åº¦ç¼“å†²ä¸é¢œè‰²ç¼“å†²
             GLES20.glClear( GLES20.GL_DEPTH_BUFFER_BIT | GLES20.GL_COLOR_BUFFER_BIT);
-            //ÉèÖÃcameraÎ»ÖÃ
+            //è®¾ç½®cameraä½ç½®
             MatrixState.setCamera
             (
-            		cx,   //ÈËÑÛÎ»ÖÃµÄX
-            		cy, 	//ÈËÑÛÎ»ÖÃµÄY
-            		cz,   //ÈËÑÛÎ»ÖÃµÄZ
-            		tx, 	//ÈËÑÛÇò¿´µÄµãX
-            		ty,   //ÈËÑÛÇò¿´µÄµãY
-            		tz,   //ÈËÑÛÇò¿´µÄµãZ
-            		0, 	//upÎ»ÖÃ
+            		cx,   //äººçœ¼ä½ç½®çš„X
+            		cy, 	//äººçœ¼ä½ç½®çš„Y
+            		cz,   //äººçœ¼ä½ç½®çš„Z
+            		tx, 	//äººçœ¼çƒçœ‹çš„ç‚¹X
+            		ty,   //äººçœ¼çƒçœ‹çš„ç‚¹Y
+            		tz,   //äººçœ¼çƒçœ‹çš„ç‚¹Z
+            		0, 	//upä½ç½®
             		1, 
             		0
             );
-            //³õÊ¼»¯¹âÔ´Î»ÖÃ
+            //åˆå§‹åŒ–å…‰æºä½ç½®
             MatrixState.setLightLocation(lx, ly, lz);                    
-            //Èô¼ÓÔØµÄÎïÌå²¿Î»¿ÕÔò»æÖÆÎïÌå            
-            pm.drawSelf(0);//Æ½Ãæ
-            drawObject(1);
-            
-            drawObject(0);
+            //è‹¥åŠ è½½çš„ç‰©ä½“éƒ¨ä½ç©ºåˆ™ç»˜åˆ¶ç‰©ä½“
+
+            GLES20.glCullFace(GLES20.GL_FRONT);
+            pm.drawSelf(0);//å¹³é¢
+            drawObject(0);//ç‰©ä½“
+//            drawObject(1);//é˜´å½±
            
         } 
         
         public void drawObject(int situ)
         {
-            //»æÖÆ³¤·½Ìå
+            //ç»˜åˆ¶é•¿æ–¹ä½“
             MatrixState.pushMatrix();
             MatrixState.scale(1.0f, 1.0f, 1.0f);
             MatrixState.translate(-10f, 5f, 0);
             cft.drawSelf(situ);
             MatrixState.popMatrix();   
-            //»æÖÆÇòÌå
+            //ç»˜åˆ¶çƒä½“
             MatrixState.pushMatrix();
             MatrixState.scale(1.5f, 1.5f, 1.5f);
             MatrixState.translate(10f, 0f, 0);
             qt.drawSelf(situ);
             MatrixState.popMatrix();  
-            //»æÖÆÔ²»·
+            //ç»˜åˆ¶åœ†ç¯
             MatrixState.pushMatrix();
             MatrixState.scale(1.5f, 1.5f, 1.5f);
             MatrixState.translate(0, 0, -10f);
             yh.drawSelf(situ);
             MatrixState.popMatrix();  
-            //»æÖÆ²èºø
+            //ç»˜åˆ¶èŒ¶å£¶
             MatrixState.pushMatrix();
             MatrixState.scale(1.5f, 1.5f, 1.5f);
             MatrixState.translate(0, 0, 10f);
@@ -147,16 +148,16 @@ class MySurfaceView extends GLSurfaceView
         }
 
         public void onSurfaceChanged(GL10 gl, int width, int height) {
-            //ÉèÖÃÊÓ´°´óĞ¡¼°Î»ÖÃ 
+            //è®¾ç½®è§†çª—å¤§å°åŠä½ç½® 
         	GLES20.glViewport(0, 0, width, height);
-        	//¼ÆËãGLSurfaceViewµÄ¿í¸ß±È
+        	//è®¡ç®—GLSurfaceViewçš„å®½é«˜æ¯”
             float ratio = (float) width / height;
-            //µ÷ÓÃ´Ë·½·¨¼ÆËã²úÉúÍ¸ÊÓÍ¶Ó°¾ØÕó
+            //è°ƒç”¨æ­¤æ–¹æ³•è®¡ç®—äº§ç”Ÿé€è§†æŠ•å½±çŸ©é˜µ
             MatrixState.setProjectFrustum(-ratio, ratio, -1, 1, 2, 100);
 
-            //¼ÆËãÉãÏñ»úµÄÎ»ÖÃ
+            //è®¡ç®—æ‘„åƒæœºçš„ä½ç½®
             setCameraPostion();
-            //¼ÆËãµÆ¹âµÄÎ»ÖÃ
+            //è®¡ç®—ç¯å…‰çš„ä½ç½®
             setLightPostion();
             new Thread(){
             	@Override
@@ -164,7 +165,7 @@ class MySurfaceView extends GLSurfaceView
             		while(true){
                 		lightAzimuth +=1;
                 		lightAzimuth %= 360;
-                		//¼ÆËãµÆ¹âµÄÎ»ÖÃ
+                		//è®¡ç®—ç¯å…‰çš„ä½ç½®
                         setLightPostion();
                 		try {
     						Thread.sleep(50);
@@ -177,15 +178,15 @@ class MySurfaceView extends GLSurfaceView
         }
 
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-            //ÉèÖÃÆÁÄ»±³¾°É«RGBA
+            //è®¾ç½®å±å¹•èƒŒæ™¯è‰²RGBA
             GLES20.glClearColor(0.3f,0.3f,0.3f,1.0f);
-            //´ò¿ªÉî¶È¼ì²â
+            //æ‰“å¼€æ·±åº¦æ£€æµ‹
             GLES20.glEnable(GLES20.GL_DEPTH_TEST);
-            //¹Ø±Õ±³Ãæ¼ô²Ã
+            //å…³é—­èƒŒé¢å‰ªè£
             GLES20.glDisable(GLES20.GL_CULL_FACE);
-            //³õÊ¼»¯±ä»»¾ØÕó
+            //åˆå§‹åŒ–å˜æ¢çŸ©é˜µ
             MatrixState.setInitStack();            
-            //¼ÓÔØÒª»æÖÆµÄÎïÌå
+            //åŠ è½½è¦ç»˜åˆ¶çš„ç‰©ä½“
             ch=LoadUtil.loadFromFileVertexOnlyAverage("ch.obj", MySurfaceView.this.getResources(),getContext());
             pm=LoadUtil.loadFromFileVertexOnlyFace("pm.obj", MySurfaceView.this.getResources(),getContext());;
     		cft=LoadUtil.loadFromFileVertexOnlyFace("cft.obj", MySurfaceView.this.getResources(),getContext());;
