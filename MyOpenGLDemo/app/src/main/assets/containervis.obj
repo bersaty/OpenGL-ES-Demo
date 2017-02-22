@@ -1,0 +1,30 @@
+# 3ds Max Wavefront OBJ Exporter v0.97b - (c)2007 guruware
+# File Created: 04.12.2010 00:32:56
+
+mtllib containervis.mtl
+
+#
+# object Box02
+#
+
+v  12.4038 -7.4142 -4.0089
+v  12.4038 7.5160 -4.0082
+v  -12.4800 7.5160 -4.0082
+v  -12.4800 -7.4142 -4.0089
+# 4 vertices
+
+vn 0.0000 -0.0000 1.0000
+# 1 vertex normals
+
+vt 1.0000 1.0000 0.0000
+vt 1.0000 0.0000 0.0000
+vt 0.0000 0.0000 0.0000
+vt 0.0000 1.0000 0.0000
+# 4 texture coords
+
+g Box02
+usemtl 07___Default
+s 8
+f 1/1/1 2/2/1 3/3/1 4/4/1 
+# 1 polygons
+

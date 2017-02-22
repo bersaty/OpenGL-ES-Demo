@@ -78,6 +78,15 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".mydice.DiceActivity"
+            android:label="骰子"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="opengldemo" />
+            </intent-filter>
+        </activity>
+
     </application>
 
 </manifest>

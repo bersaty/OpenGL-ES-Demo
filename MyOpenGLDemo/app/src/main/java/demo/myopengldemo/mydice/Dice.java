@@ -1,0 +1,185 @@
+package demo.myopengldemo.mydice;
+
+import android.content.Context;
+import android.opengl.GLES20;
+
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
+
+import demo.myopengldemo.R;
+
+/**
+ * Created by wuchunhui on 17-2-21.
+ */
+
+public class Dice {
+
+    FloatBuffer mVerticesBuffer;//顶点坐标数据缓冲
+    FloatBuffer mNormalBuffer;//顶点法向量数据缓冲
+    FloatBuffer mVerticesTextureBuffer;
+
+    private int mProgram;
+    private Context mContext;
+
+    private int mMVPMatrixHandle;
+    private int mPositionHandle;
+    private int mColorHandle;
+    private int mTextureId;
+    private int mTextureCoordinationHandle;
+
+    public Dice(Context context){
+        mContext = context;
+        initData();
+        initShader();
+    }
+
+    public void initData(){
+
+        // 骰子的顶点数据
+        float[] mDiceVertices = {
+                // Positions
+                -6.0f,  6.0f, -6.0f,//font
+                -6.0f, -6.0f, -6.0f,
+                6.0f, -6.0f, -6.0f,
+                6.0f, -6.0f, -6.0f,
+                6.0f,  6.0f, -6.0f,
+                -6.0f,  6.0f, -6.0f,
+
+                -6.0f, -6.0f,  6.0f,//left
+                -6.0f, -6.0f, -6.0f,
+                -6.0f,  6.0f, -6.0f,
+                -6.0f,  6.0f, -6.0f,
+                -6.0f,  6.0f,  6.0f,
+                -6.0f, -6.0f,  6.0f,
+
+                6.0f, -6.0f, -6.0f,//right
+                6.0f, -6.0f,  6.0f,
+                6.0f,  6.0f,  6.0f,
+                6.0f,  6.0f,  6.0f,
+                6.0f,  6.0f, -6.0f,
+                6.0f, -6.0f, -6.0f,
+
+                -6.0f, -6.0f,  6.0f,//back
+                -6.0f,  6.0f,  6.0f,
+                6.0f,  6.0f,  6.0f,
+                6.0f,  6.0f,  6.0f,
+                6.0f, -6.0f,  6.0f,
+                -6.0f, -6.0f,  6.0f,
+
+                -6.0f,  6.0f, -6.0f,//top
+                6.0f,  6.0f, -6.0f,
+                6.0f,  6.0f,  6.0f,
+                6.0f,  6.0f,  6.0f,
+                -6.0f,  6.0f,  6.0f,
+                -6.0f,  6.0f, -6.0f,
+
+                -6.0f, -6.0f, -6.0f,//bottom
+                -6.0f, -6.0f,  6.0f,
+                6.0f, -6.0f, -6.0f,
+                6.0f, -6.0f, -6.0f,
+                -6.0f, -6.0f,  6.0f,
+                6.0f, -6.0f,  6.0f
+        };
+
+        // 骰子的顶点法线数据
+        float[] mDiceVerticesNormal = {
+                // Positions
+                0.0f,  0.0f, -6.0f,//font
+                0.0f, 0.0f, -6.0f,
+                0.0f, 0.0f, -6.0f,
+                0.0f, 0.0f, -6.0f,
+                0.0f,  0.0f, -6.0f,
+                0.0f,  0.0f, -6.0f,
+
+                -6.0f, 0.0f,  0.0f,//left
+                -6.0f, 0.0f, 0.0f,
+                -6.0f,  0.0f, 0.0f,
+                -6.0f,  0.0f, 0.0f,
+                -6.0f,  0.0f,  0.0f,
+                -6.0f, 0.0f,  0.0f,
+
+                6.0f, 0.0f, 0.0f,//right
+                6.0f, 0.0f,  0.0f,
+                6.0f,  0.0f,  0.0f,
+                6.0f,  0.0f,  0.0f,
+                6.0f,  0.0f, 0.0f,
+                6.0f, 0.0f, 0.0f,
+
+                0.0f, 0.0f,  6.0f,//back
+                0.0f,  0.0f,  6.0f,
+                0.0f,  0.0f,  6.0f,
+                0.0f,  0.0f,  6.0f,
+                0.0f, 0.0f,  6.0f,
+                0.0f, 0.0f,  6.0f,
+
+                0.0f,  6.0f, 0.0f,//top
+                0.0f,  6.0f, 0.0f,
+                0.0f,  6.0f,  0.0f,
+                0.0f,  6.0f,  0.0f,
+                0.0f,  6.0f,  0.0f,
+                0.0f,  6.0f, 0.0f,
+
+                0.0f, -6.0f, 0.0f,//bottom
+                0.0f, -6.0f,  0.0f,
+                0.0f, -6.0f, 0.0f,
+                0.0f, -6.0f, 0.0f,
+                0.0f, -6.0f,  0.0f,
+                0.0f, -6.0f,  0.0f
+        };
+
+        // Initialize the buffers.
+        mVerticesBuffer = ByteBuffer.allocateDirect(mDiceVertices.length * 4)
+                .order(ByteOrder.nativeOrder()).asFloatBuffer();
+        mVerticesBuffer.put(mDiceVertices).position(0);
+
+        mNormalBuffer = ByteBuffer.allocateDirect(mDiceVerticesNormal.length*4)
+                .order(ByteOrder.nativeOrder()).asFloatBuffer();
+        mNormalBuffer.position(0);
+    }
+
+    private void initShader(){
+        mProgram = MyGLUtils.buildProgram(mContext, R.raw.dice_bg_vertex, R.raw.dice_bg_fragment);
+
+        mTextureId = MyGLUtils.loadTexture(mContext,R.drawable.dice,new int[2]);
+
+        // Set program handles. These will later be used to pass in values to the program.
+        mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "u_MVPMatrix");
+//        mTextureUniformHandle = GLES20.glGetUniformLocation(mProgram,"u_Texture");
+        mPositionHandle = GLES20.glGetAttribLocation(mProgram, "a_Position");
+//        mColorHandle = GLES20.glGetAttribLocation(mProgram, "a_Color");
+        mTextureCoordinationHandle = GLES20.glGetAttribLocation(mProgram,"a_TexCoordinate");
+//        mGlobalTimeHandle = GLES20.glGetUniformLocation(mProgram,"u_GlobalTime");
+
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_REPEAT);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_REPEAT);
+    }
+
+    public void drawSelf(float[] mvpMatrix) {
+
+        GLES20.glUseProgram(mProgram);
+
+        // Pass in the position information
+        mVerticesBuffer.position(0);
+        GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false,
+                3*4, mVerticesBuffer);
+        GLES20.glEnableVertexAttribArray(mPositionHandle);
+
+//        mVerticesTextureBuffer.position(0);
+//        GLES20.glVertexAttribPointer(mTextureCoordinationHandle,2, GLES20.GL_FLOAT,false,2*4,mVerticesTextureBuffer);
+//        GLES20.glEnableVertexAttribArray(mTextureCoordinationHandle);
+
+        // This multiplies the view matrix by the model matrix, and stores the result in the MVP matrix
+        // (which currently contains model * view).
+//        Matrix.multiplyMM(mMVPMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
+        // This multiplies the modelview matrix by the projection matrix, and stores the result in the MVP matrix
+        // (which now contains model * view * projection).
+//        Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVPMatrix, 0);
+
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureId);
+
+        GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mvpMatrix, 0);
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 36);
+    }
+
+}
