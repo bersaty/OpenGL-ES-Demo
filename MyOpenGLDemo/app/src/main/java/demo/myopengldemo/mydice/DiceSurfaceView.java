@@ -27,7 +27,7 @@ public class DiceSurfaceView extends GLSurfaceView {
     float ty=0;//目标点y位置
     float tz=0;//目标点z位置
     public float currSightDis=60;//摄像机和目标的距离
-    float angdegElevation=0;//仰角
+    float angdegElevation=90;//仰角
     public float angdegAzimuth=180;//方位角
 
     //关于灯光的变量
@@ -35,7 +35,7 @@ public class DiceSurfaceView extends GLSurfaceView {
     float ly=0;//y位置
     float lz=0;//z位置
     float lightDis=100;
-    float lightElevation=40;//灯光仰角
+    float lightElevation=70;//灯光仰角
     public float lightAzimuth=180;//灯光的方位角
     public DiceSurfaceView(Context context) {
         super(context);
@@ -61,7 +61,7 @@ public class DiceSurfaceView extends GLSurfaceView {
                 angdegElevation = Math.max(angdegElevation, 5);
                 angdegElevation = Math.min(angdegElevation, 90);
                 //设置摄像机的位置
-//                setCameraPostion();
+                setCameraPostion();
         }
         mPreviousY = y;//记录触控笔位置
         mPreviousX = x;//记录触控笔位置
@@ -119,15 +119,16 @@ public class DiceSurfaceView extends GLSurfaceView {
 
             //绘制地板
             MatrixState.pushMatrix();
-            MatrixState.rotate(-30,1,0,0);
-            mBackground.drawSelf(MatrixState.getFinalMatrix());
+            MatrixState.rotate(-90,1,0,0);
+            mBackground.drawSelf();
             MatrixState.popMatrix();
 
             //绘制骰子
             MatrixState.pushMatrix();
-            MatrixState.translate(0,6,0);
-            MatrixState.rotate(-30,1,1,0);
-            mDice.drawSelf(MatrixState.getFinalMatrix());
+            MatrixState.translate(0,2,0);
+//            MatrixState.rotate(-30,1,1,0);
+            mDice.drawSelf(0);
+            mDice.drawSelf(1);
             MatrixState.popMatrix();
         }
 
@@ -172,7 +173,7 @@ public class DiceSurfaceView extends GLSurfaceView {
             MatrixState.setInitStack();
 
             mBackground = new Background(getContext());
-            mDice = new Dice(getContext());
+            mDice = LoadUtil.loadDiceObj("boxes.wvo",getResources(),getContext());
         }
 
     }

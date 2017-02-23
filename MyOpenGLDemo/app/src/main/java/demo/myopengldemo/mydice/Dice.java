@@ -19,167 +19,112 @@ public class Dice {
     FloatBuffer mNormalBuffer;//顶点法向量数据缓冲
     FloatBuffer mVerticesTextureBuffer;
 
+    private int mVertexCount;
+
     private int mProgram;
     private Context mContext;
 
+    private int mModelMatrixHandle;
+    private int mVPMatrixHandle;
     private int mMVPMatrixHandle;
     private int mPositionHandle;
     private int mColorHandle;
     private int mTextureId;
     private int mTextureCoordinationHandle;
+    private int mIsShadowHandle;
+    private int mLightPositionHandle;
+    private int mCameraPositionHandle;
+    private int mNormalHandle;
 
-    public Dice(Context context){
+    public Dice(Context context,float[] verticesData,float[] verticesNormalData){
         mContext = context;
-        initData();
+        initData(verticesData,verticesNormalData);
         initShader();
     }
 
-    public void initData(){
+    public void initData(float[] verticesData,float[] verticesNormalData){
 
-        // 骰子的顶点数据
-        float[] mDiceVertices = {
-                // Positions
-                -6.0f,  6.0f, -6.0f,//font
-                -6.0f, -6.0f, -6.0f,
-                6.0f, -6.0f, -6.0f,
-                6.0f, -6.0f, -6.0f,
-                6.0f,  6.0f, -6.0f,
-                -6.0f,  6.0f, -6.0f,
-
-                -6.0f, -6.0f,  6.0f,//left
-                -6.0f, -6.0f, -6.0f,
-                -6.0f,  6.0f, -6.0f,
-                -6.0f,  6.0f, -6.0f,
-                -6.0f,  6.0f,  6.0f,
-                -6.0f, -6.0f,  6.0f,
-
-                6.0f, -6.0f, -6.0f,//right
-                6.0f, -6.0f,  6.0f,
-                6.0f,  6.0f,  6.0f,
-                6.0f,  6.0f,  6.0f,
-                6.0f,  6.0f, -6.0f,
-                6.0f, -6.0f, -6.0f,
-
-                -6.0f, -6.0f,  6.0f,//back
-                -6.0f,  6.0f,  6.0f,
-                6.0f,  6.0f,  6.0f,
-                6.0f,  6.0f,  6.0f,
-                6.0f, -6.0f,  6.0f,
-                -6.0f, -6.0f,  6.0f,
-
-                -6.0f,  6.0f, -6.0f,//top
-                6.0f,  6.0f, -6.0f,
-                6.0f,  6.0f,  6.0f,
-                6.0f,  6.0f,  6.0f,
-                -6.0f,  6.0f,  6.0f,
-                -6.0f,  6.0f, -6.0f,
-
-                -6.0f, -6.0f, -6.0f,//bottom
-                -6.0f, -6.0f,  6.0f,
-                6.0f, -6.0f, -6.0f,
-                6.0f, -6.0f, -6.0f,
-                -6.0f, -6.0f,  6.0f,
-                6.0f, -6.0f,  6.0f
-        };
-
-        // 骰子的顶点法线数据
-        float[] mDiceVerticesNormal = {
-                // Positions
-                0.0f,  0.0f, -6.0f,//font
-                0.0f, 0.0f, -6.0f,
-                0.0f, 0.0f, -6.0f,
-                0.0f, 0.0f, -6.0f,
-                0.0f,  0.0f, -6.0f,
-                0.0f,  0.0f, -6.0f,
-
-                -6.0f, 0.0f,  0.0f,//left
-                -6.0f, 0.0f, 0.0f,
-                -6.0f,  0.0f, 0.0f,
-                -6.0f,  0.0f, 0.0f,
-                -6.0f,  0.0f,  0.0f,
-                -6.0f, 0.0f,  0.0f,
-
-                6.0f, 0.0f, 0.0f,//right
-                6.0f, 0.0f,  0.0f,
-                6.0f,  0.0f,  0.0f,
-                6.0f,  0.0f,  0.0f,
-                6.0f,  0.0f, 0.0f,
-                6.0f, 0.0f, 0.0f,
-
-                0.0f, 0.0f,  6.0f,//back
-                0.0f,  0.0f,  6.0f,
-                0.0f,  0.0f,  6.0f,
-                0.0f,  0.0f,  6.0f,
-                0.0f, 0.0f,  6.0f,
-                0.0f, 0.0f,  6.0f,
-
-                0.0f,  6.0f, 0.0f,//top
-                0.0f,  6.0f, 0.0f,
-                0.0f,  6.0f,  0.0f,
-                0.0f,  6.0f,  0.0f,
-                0.0f,  6.0f,  0.0f,
-                0.0f,  6.0f, 0.0f,
-
-                0.0f, -6.0f, 0.0f,//bottom
-                0.0f, -6.0f,  0.0f,
-                0.0f, -6.0f, 0.0f,
-                0.0f, -6.0f, 0.0f,
-                0.0f, -6.0f,  0.0f,
-                0.0f, -6.0f,  0.0f
-        };
+        mVertexCount = verticesData.length/3;
 
         // Initialize the buffers.
-        mVerticesBuffer = ByteBuffer.allocateDirect(mDiceVertices.length * 4)
+        mVerticesBuffer = ByteBuffer.allocateDirect(verticesData.length * 4)
                 .order(ByteOrder.nativeOrder()).asFloatBuffer();
-        mVerticesBuffer.put(mDiceVertices).position(0);
+        mVerticesBuffer.put(verticesData).position(0);
 
-        mNormalBuffer = ByteBuffer.allocateDirect(mDiceVerticesNormal.length*4)
+        mNormalBuffer = ByteBuffer.allocateDirect(verticesNormalData.length*4)
                 .order(ByteOrder.nativeOrder()).asFloatBuffer();
-        mNormalBuffer.position(0);
+        mNormalBuffer.put(verticesNormalData).position(0);
+
+//        mVerticesTextureBuffer = ByteBuffer.allocateDirect(textureCoordinateData.length * 4)
+//                .order(ByteOrder.nativeOrder()).asFloatBuffer();
+//        mVerticesBuffer.put(textureCoordinateData).position(0);
     }
 
     private void initShader(){
-        mProgram = MyGLUtils.buildProgram(mContext, R.raw.dice_bg_vertex, R.raw.dice_bg_fragment);
+        mProgram = MyGLUtils.buildProgram(mContext, R.raw.dice_scene_vertex, R.raw.dice_scene_frag);
 
-        mTextureId = MyGLUtils.loadTexture(mContext,R.drawable.dice,new int[2]);
+        mTextureId = MyGLUtils.loadTexture(mContext,R.drawable.t3,new int[2]);
 
-        // Set program handles. These will later be used to pass in values to the program.
-        mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "u_MVPMatrix");
-//        mTextureUniformHandle = GLES20.glGetUniformLocation(mProgram,"u_Texture");
-        mPositionHandle = GLES20.glGetAttribLocation(mProgram, "a_Position");
-//        mColorHandle = GLES20.glGetAttribLocation(mProgram, "a_Color");
-        mTextureCoordinationHandle = GLES20.glGetAttribLocation(mProgram,"a_TexCoordinate");
-//        mGlobalTimeHandle = GLES20.glGetUniformLocation(mProgram,"u_GlobalTime");
+        mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");
+        mModelMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMMatrix");
+        mVPMatrixHandle = GLES20.glGetUniformLocation(mProgram,"uMProjCameraMatrix");
+        mPositionHandle = GLES20.glGetAttribLocation(mProgram, "aPosition");
+        mCameraPositionHandle = GLES20.glGetUniformLocation(mProgram, "uCamera");
+        mLightPositionHandle = GLES20.glGetUniformLocation(mProgram, "uLightLocation");
+        mTextureCoordinationHandle = GLES20.glGetAttribLocation(mProgram,"aTextureCoord");
+        mNormalHandle = GLES20.glGetAttribLocation(mProgram, "aNormal");
+        mIsShadowHandle = GLES20.glGetUniformLocation(mProgram,"isShadow");
 
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_REPEAT);
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_REPEAT);
     }
 
-    public void drawSelf(float[] mvpMatrix) {
-
+    public void drawSelf(int isShadow) {
+        //制定使用某套着色器程序
         GLES20.glUseProgram(mProgram);
+        //将最终变换矩阵传入着色器程序
+        GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, MatrixState.getFinalMatrix(), 0);
+        //将位置、旋转变换矩阵传入着色器程序
+        GLES20.glUniformMatrix4fv(mModelMatrixHandle, 1, false, MatrixState.getMMatrix(), 0);
+        //将光源位置传入着色器程序
+        GLES20.glUniform3fv(mLightPositionHandle, 1, MatrixState.lightPositionFB);
+        //将摄像机位置传入着色器程序
+        GLES20.glUniform3fv(mCameraPositionHandle, 1, MatrixState.cameraFB);
+        //将是否绘制阴影属性传入着色器程序
+        GLES20.glUniform1i(mIsShadowHandle, isShadow);
+        //将投影、摄像机组合矩阵传入着色器程序
+        GLES20.glUniformMatrix4fv(mVPMatrixHandle, 1, false, MatrixState.getViewProjMatrix(), 0);
 
-        // Pass in the position information
-        mVerticesBuffer.position(0);
-        GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false,
-                3*4, mVerticesBuffer);
+        //将顶点位置数据传入渲染管线
+        GLES20.glVertexAttribPointer
+                (
+                        mPositionHandle,
+                        3,
+                        GLES20.GL_FLOAT,
+                        false,
+                        3*4,
+                        mVerticesBuffer
+                );
+        //将顶点法向量数据传入渲染管线
+        GLES20.glVertexAttribPointer
+                (
+                        mNormalHandle,
+                        3,
+                        GLES20.GL_FLOAT,
+                        false,
+                        3*4,
+                        mNormalBuffer
+                );
+        //启用顶点位置、法向量数据
         GLES20.glEnableVertexAttribArray(mPositionHandle);
+        GLES20.glEnableVertexAttribArray(mNormalHandle);
 
-//        mVerticesTextureBuffer.position(0);
-//        GLES20.glVertexAttribPointer(mTextureCoordinationHandle,2, GLES20.GL_FLOAT,false,2*4,mVerticesTextureBuffer);
-//        GLES20.glEnableVertexAttribArray(mTextureCoordinationHandle);
-
-        // This multiplies the view matrix by the model matrix, and stores the result in the MVP matrix
-        // (which currently contains model * view).
-//        Matrix.multiplyMM(mMVPMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
-        // This multiplies the modelview matrix by the projection matrix, and stores the result in the MVP matrix
-        // (which now contains model * view * projection).
-//        Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVPMatrix, 0);
-
+        //设置纹理
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureId);
+//        GLES20.glUniform1i(mTextureHandle, 0);
 
-        GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mvpMatrix, 0);
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 36);
+        //绘制被加载的物体
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, mVertexCount);
     }
 
 }

@@ -95,7 +95,7 @@ public class Background {
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_REPEAT);
     }
 
-    public void drawSelf(float[] mvpMatrix) {
+    public void drawSelf() {
 
         GLES20.glUseProgram(mProgram);
 
@@ -117,7 +117,7 @@ public class Background {
 //        Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVPMatrix, 0);
 
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureId);
-        GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mvpMatrix, 0);
+        GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, MatrixState.getFinalMatrix(), 0);
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 6);
 
     }
