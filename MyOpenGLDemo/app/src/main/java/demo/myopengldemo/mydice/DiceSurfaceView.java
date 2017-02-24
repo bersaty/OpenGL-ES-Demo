@@ -35,8 +35,8 @@ public class DiceSurfaceView extends GLSurfaceView {
     float ly=0;//y位置
     float lz=0;//z位置
     float lightDis=100;
-    float lightElevation=70;//灯光仰角
-    public float lightAzimuth=180;//灯光的方位角
+    float lightElevation=50;//灯光仰角
+    public float lightAzimuth=-30;//灯光的方位角
     public DiceSurfaceView(Context context) {
         super(context);
         this.setEGLContextClientVersion(2); //设置使用OPENGL ES2.0
@@ -125,8 +125,24 @@ public class DiceSurfaceView extends GLSurfaceView {
 
             //绘制骰子
             MatrixState.pushMatrix();
-            MatrixState.translate(0,2,0);
+            MatrixState.translate(0,0,0);
 //            MatrixState.rotate(-30,1,1,0);
+            mDice.drawSelf(0);
+            mDice.drawSelf(1);
+            MatrixState.popMatrix();
+
+            //绘制骰子
+            MatrixState.pushMatrix();
+            MatrixState.translate(15,5,10);
+            MatrixState.rotate(-30,1,1,0);
+            mDice.drawSelf(0);
+            mDice.drawSelf(1);
+            MatrixState.popMatrix();
+
+            //绘制骰子
+            MatrixState.pushMatrix();
+            MatrixState.translate(-15,5,-10);
+            MatrixState.rotate(-60,1,1,0);
             mDice.drawSelf(0);
             mDice.drawSelf(1);
             MatrixState.popMatrix();
@@ -151,7 +167,7 @@ public class DiceSurfaceView extends GLSurfaceView {
                         lightAzimuth +=1;
                         lightAzimuth %= 360;
                         //改变灯光的位置
-                        setLightPostion();
+//                        setLightPostion();
                         try {
                             Thread.sleep(50);
                         } catch (InterruptedException e) {

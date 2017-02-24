@@ -45,17 +45,17 @@ public class Background {
         // 平面顶点坐标，需要旋转一下，这些顶点z轴都为0
         final float[] VerticesData = {
                 // X, Y, Z,
-                -30.0f, -30.0f, 0.0f,
+                -60.0f, -30.0f, 0.0f,
 
-                30.0f, -30.0f, 0.0f,
+                60.0f, -30.0f, 0.0f,
 
-                30.0f, 30.0f, 0.0f,
+                60.0f, 30.0f, 0.0f,
 
-                -30.0f, -30.0f, 0.0f,
+                -60.0f, -30.0f, 0.0f,
 
-                30.0f, 30.0f, 0.0f,
+                60.0f, 30.0f, 0.0f,
 
-                -30.0f, 30.0f, 0.0f,
+                -60.0f, 30.0f, 0.0f,
         };
 
         final float[] TextureCoordinateData = {
