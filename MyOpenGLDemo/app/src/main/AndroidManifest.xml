@@ -87,6 +87,14 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".Sample6_1.Sample6_1_Activity"
+            android:label="物体碰撞"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="opengldemo" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
