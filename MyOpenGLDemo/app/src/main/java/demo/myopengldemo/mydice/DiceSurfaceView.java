@@ -3,6 +3,7 @@ package demo.myopengldemo.mydice;
 import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
+import android.opengl.Matrix;
 import android.view.MotionEvent;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -61,7 +62,7 @@ public class DiceSurfaceView extends GLSurfaceView {
                 angdegElevation = Math.max(angdegElevation, 5);
                 angdegElevation = Math.min(angdegElevation, 90);
                 //设置摄像机的位置
-                setCameraPostion();
+//                setCameraPostion();
         }
         mPreviousY = y;//记录触控笔位置
         mPreviousX = x;//记录触控笔位置
@@ -115,7 +116,12 @@ public class DiceSurfaceView extends GLSurfaceView {
             MatrixState.setLightLocation(lx, ly, lz);
             //若加载的物体部位空则绘制物体
 
-            GLES20.glCullFace(GLES20.GL_FRONT);
+//            GLES20.glCullFace(GLES20.GL_FRONT);
+
+            //绘制阴影开启混合
+            GLES20.glEnable(GLES20.GL_BLEND);
+            GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+            GLES20.glCullFace(GLES20.GL_BACK);
 
             //绘制地板
             MatrixState.pushMatrix();
@@ -123,26 +129,32 @@ public class DiceSurfaceView extends GLSurfaceView {
             mBackground.drawSelf();
             MatrixState.popMatrix();
 
-            //绘制骰子
+            //绘制骰子 中间
             MatrixState.pushMatrix();
-            MatrixState.translate(0,0,0);
+            MatrixState.translate(0,6,0);
 //            MatrixState.rotate(-30,1,1,0);
+            MatrixState.scale(2.5f,2.5f,2.5f);
+            MatrixState.rotate(angdegAzimuth,1,1,0);
             mDice.drawSelf(0);
             mDice.drawSelf(1);
             MatrixState.popMatrix();
 
-            //绘制骰子
+            //绘制骰子 左下
             MatrixState.pushMatrix();
             MatrixState.translate(15,5,10);
             MatrixState.rotate(-30,1,1,0);
+            MatrixState.scale(2.5f,2.5f,2.5f);
+            MatrixState.rotate(angdegAzimuth,1,0,1);
             mDice.drawSelf(0);
             mDice.drawSelf(1);
             MatrixState.popMatrix();
 
-            //绘制骰子
+            //绘制骰子 右上
             MatrixState.pushMatrix();
             MatrixState.translate(-15,5,-10);
             MatrixState.rotate(-60,1,1,0);
+            MatrixState.scale(2.5f,2.5f,2.5f);
+            MatrixState.rotate(angdegAzimuth,0,1,1);
             mDice.drawSelf(0);
             mDice.drawSelf(1);
             MatrixState.popMatrix();
@@ -185,11 +197,16 @@ public class DiceSurfaceView extends GLSurfaceView {
             GLES20.glEnable(GLES20.GL_DEPTH_TEST);
             //关闭背面剪裁
             GLES20.glDisable(GLES20.GL_CULL_FACE);
+
+            //开启混合，阴影可以有透明度
+//            GLES20.glEnable(GLES20.GL_BLEND);
+//            GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+
             //初始化变换矩阵
             MatrixState.setInitStack();
 
             mBackground = new Background(getContext());
-            mDice = LoadUtil.loadDiceObj("boxes.wvo",getResources(),getContext());
+            mDice = LoadUtil.loadDiceObj("cube.obj",getResources(),getContext());
         }
 
     }

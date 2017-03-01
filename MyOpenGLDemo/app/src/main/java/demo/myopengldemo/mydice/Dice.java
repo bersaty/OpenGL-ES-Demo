@@ -63,7 +63,7 @@ public class Dice {
     private void initShader(){
         mProgram = MyGLUtils.buildProgram(mContext, R.raw.dice_scene_vertex, R.raw.dice_scene_frag);
 
-        mTextureId = MyGLUtils.loadTexture(mContext,R.drawable.t3,new int[2]);
+        mTextureId = MyGLUtils.loadTexture(mContext,R.drawable.t1,new int[2]);
 
         mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");
         mModelMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMMatrix");
