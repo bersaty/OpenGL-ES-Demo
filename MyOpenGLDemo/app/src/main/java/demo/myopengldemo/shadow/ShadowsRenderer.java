@@ -10,6 +10,7 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import demo.myopengldemo.R;
+import demo.myopengldemo.utils.MyGLUtils;
 
 public class ShadowsRenderer implements GLSurfaceView.Renderer {
 
@@ -22,15 +23,14 @@ public class ShadowsRenderer implements GLSurfaceView.Renderer {
     /**
 	 * Handles to vertex and fragment shader programs
 	 */
-	private RenderProgram mPCFShadowDynamicBiasProgram;
+	private int mPCFShadowDynamicBiasProgram;
 	
 	/**
 	 * The vertex and fragment shader to render depth map
 	 */
-	private RenderProgram mDepthMapProgram;
+	private int mDepthMapProgram;
 	
-	private int mActiveProgram;
-	
+
     private final float[] mMVPMatrix = new float[16];
     private final float[] mMVMatrix = new float[16];
     private final float[] mNormalMatrix = new float[16];
@@ -71,7 +71,7 @@ public class ShadowsRenderer implements GLSurfaceView.Renderer {
     private final float[] mLightPosModel = new float []
     		{-5.0f, 9.0f, 0.0f, 1.0f};
     
-    private float[] mActualLightPosition = new float[4];
+    private float[] mActualLightPosition = new float[]{-5.0f, 9.0f, 0.0f, 1.0f};
     
     /**
      * Current X,Y axis rotation of center cube
@@ -94,7 +94,7 @@ public class ShadowsRenderer implements GLSurfaceView.Renderer {
 	private boolean mHasDepthTextureExtension = false;
 	
 	int[] fboId;
-	int[] depthTextureId;
+//	int[] depthTextureId;
 	int[] renderTextureId;
 	
 	// Uniform locations for scene render program
@@ -126,6 +126,8 @@ public class ShadowsRenderer implements GLSurfaceView.Renderer {
 	
 	private Plane mPlane;
 
+	LoadedObjectVertexNormalAverage ch;
+
 	public ShadowsRenderer(final ShadowsActivity shadowsActivity) {
 		mShadowsActivity = shadowsActivity;
 	}
@@ -150,7 +152,7 @@ public class ShadowsRenderer implements GLSurfaceView.Renderer {
         
         //arrange scene
         //center cube
-        mCube = new Cube(new float[] {0.0f, 0.0f, 0.0f}, 3.0f, new float[] {0.0f, 0.0f, 1.0f, 1.0f});
+        mCube = new Cube(new float[] {0.0f, 0.0f, 0.0f}, 2.0f, new float[] {0.0f, 0.0f, 1.0f, 1.0f});
         
         //4 small cubes on the ground plane
         mSmallCube0 = new Cube(new float[] {-4.0f, -3.9f, 4.0f}, 2.0f, new float[] {1.0f, 0.0f, 0.0f, 1.0f});
@@ -161,10 +163,10 @@ public class ShadowsRenderer implements GLSurfaceView.Renderer {
         //ground
         mPlane = new Plane();
         
-        //Set view matrix from eye position
+        //设置相机位置，viewMatrix
         Matrix.setLookAtM(mViewMatrix, 0,
         					//eyeX, eyeY, eyeZ, 
-        					0, 4, -12,
+        					0, 5f, -20,
         					//lookX, lookY, lookZ,
         					0, 0, 0,
         					//upX, upY, upZ
@@ -175,16 +177,38 @@ public class ShadowsRenderer implements GLSurfaceView.Renderer {
         }
         else {
 
-			mPCFShadowDynamicBiasProgram = new RenderProgram(R.raw.depth_tex_v_with_shadow,
-					R.raw.depth_tex_f_with_pcf_shadow_dynamic_bias, mShadowsActivity);
+			mPCFShadowDynamicBiasProgram = MyGLUtils.buildProgram(mShadowsActivity,R.raw.depth_tex_v_with_shadow,
+					R.raw.depth_tex_f_with_pcf_shadow_dynamic_bias,null);
         	
-        	mDepthMapProgram = new RenderProgram(R.raw.depth_tex_v_depth_map,
-					R.raw.depth_tex_f_depth_map, mShadowsActivity);
+        	mDepthMapProgram = MyGLUtils.buildProgram(mShadowsActivity,R.raw.depth_tex_v_depth_map,
+					R.raw.depth_tex_f_depth_map,null);
         }
+
+
+		// Set program handles for cube drawing.
+		scene_mvpMatrixUniform = GLES20.glGetUniformLocation(mPCFShadowDynamicBiasProgram, RenderConstants.MVP_MATRIX_UNIFORM);
+		scene_mvMatrixUniform = GLES20.glGetUniformLocation(mPCFShadowDynamicBiasProgram, RenderConstants.MV_MATRIX_UNIFORM);
+		scene_normalMatrixUniform = GLES20.glGetUniformLocation(mPCFShadowDynamicBiasProgram, RenderConstants.NORMAL_MATRIX_UNIFORM);
+		scene_lightPosUniform = GLES20.glGetUniformLocation(mPCFShadowDynamicBiasProgram, RenderConstants.LIGHT_POSITION_UNIFORM);
+		scene_schadowProjMatrixUniform = GLES20.glGetUniformLocation(mPCFShadowDynamicBiasProgram, RenderConstants.SHADOW_PROJ_MATRIX);
+		scene_textureUniform = GLES20.glGetUniformLocation(mPCFShadowDynamicBiasProgram, RenderConstants.SHADOW_TEXTURE);
+		scene_positionAttribute = GLES20.glGetAttribLocation(mPCFShadowDynamicBiasProgram, RenderConstants.POSITION_ATTRIBUTE);
+		scene_normalAttribute = GLES20.glGetAttribLocation(mPCFShadowDynamicBiasProgram, RenderConstants.NORMAL_ATTRIBUTE);
+		scene_colorAttribute = GLES20.glGetAttribLocation(mPCFShadowDynamicBiasProgram, RenderConstants.COLOR_ATTRIBUTE);
+		scene_mapStepXUniform = GLES20.glGetUniformLocation(mPCFShadowDynamicBiasProgram, RenderConstants.SHADOW_X_PIXEL_OFFSET);
+		scene_mapStepYUniform = GLES20.glGetUniformLocation(mPCFShadowDynamicBiasProgram, RenderConstants.SHADOW_Y_PIXEL_OFFSET);
+
+		//shadow handles
+//		int shadowMapProgram = mDepthMapProgram.getProgram();
+		shadow_mvpMatrixUniform = GLES20.glGetUniformLocation(mDepthMapProgram, RenderConstants.MVP_MATRIX_UNIFORM);
+		shadow_positionAttribute = GLES20.glGetAttribLocation(mDepthMapProgram, RenderConstants.SHADOW_POSITION_ATTRIBUTE);
         	
         
-        mActiveProgram = mPCFShadowDynamicBiasProgram.getProgram();
-    }
+//        mActiveProgram = mPCFShadowDynamicBiasProgram.getProgram();
+
+		ch=LoadUtil.loadFromFileVertexOnlyAverage("ch.obj",mShadowsActivity.getResources(),mShadowsActivity);
+
+	}
 
     /**
 	 * Sets up the framebuffer and renderbuffer to render to texture
@@ -195,16 +219,16 @@ public class ShadowsRenderer implements GLSurfaceView.Renderer {
 		mShadowMapHeight = Math.round(mDisplayHeight * mShadowsActivity.getmShadowMapRatio());
 		
 		fboId = new int[1];
-		depthTextureId = new int[1];
+//		depthTextureId = new int[1];
 		renderTextureId = new int[1];
 		
-		// create a framebuffer object
+		//创建fbo
 		GLES20.glGenFramebuffers(1, fboId, 0);
 		
-		// create render buffer and bind 16-bit depth buffer
-		GLES20.glGenRenderbuffers(1, depthTextureId, 0);
-		GLES20.glBindRenderbuffer(GLES20.GL_RENDERBUFFER, depthTextureId[0]);
-		GLES20.glRenderbufferStorage(GLES20.GL_RENDERBUFFER, GLES20.GL_DEPTH_COMPONENT16, mShadowMapWidth, mShadowMapHeight);
+		// 创建渲染缓冲区
+//		GLES20.glGenRenderbuffers(1, depthTextureId, 0);
+//		GLES20.glBindRenderbuffer(GLES20.GL_RENDERBUFFER, depthTextureId[0]);
+//		GLES20.glRenderbufferStorage(GLES20.GL_RENDERBUFFER, GLES20.GL_DEPTH_COMPONENT16, mShadowMapWidth, mShadowMapHeight);
 		
 		// Try to use a texture depth component
 		GLES20.glGenTextures(1, renderTextureId, 0);
@@ -232,7 +256,10 @@ public class ShadowsRenderer implements GLSurfaceView.Renderer {
 	    }
 		else {
 			// Use a depth texture
-			GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_DEPTH_COMPONENT, mShadowMapWidth, mShadowMapHeight, 0, GLES20.GL_DEPTH_COMPONENT, GLES20.GL_UNSIGNED_INT, null);
+			GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D,
+					0, GLES20.GL_DEPTH_COMPONENT,
+					mShadowMapWidth, mShadowMapHeight,
+					0, GLES20.GL_DEPTH_COMPONENT, GLES20.GL_UNSIGNED_INT, null);
 	 
 	        // Attach the depth texture to FBO depth attachment point
 			GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_DEPTH_ATTACHMENT, GLES20.GL_TEXTURE_2D, renderTextureId[0], 0);
@@ -266,13 +293,16 @@ public class ShadowsRenderer implements GLSurfaceView.Renderer {
         float top = 1.0f;
         float near = 1.0f;
         float far = 100.0f;
-        
+
+		//设置透视投影，正常视觉
         Matrix.frustumM(mProjectionMatrix, 0, -ratio, ratio, bottom, top, near, far);
         
-        // this projection matrix is used at rendering shadow map
+        //设置光照位置的透视投影，用于生成深度纹理
         Matrix.frustumM(mLightProjectionMatrix, 0, -1.1f*ratio, 1.1f*ratio, 1.1f*bottom, 1.1f*top, near, far);
         //Matrix.frustumM(mLightProjectionMatrix, 0, -ratio, ratio, bottom, top, near, far);
     }
+
+
 
     @Override
     public void onDrawFrame(GL10 unused) {
@@ -280,25 +310,7 @@ public class ShadowsRenderer implements GLSurfaceView.Renderer {
     	mFPSCounter.logFrame();
     	
 //    	setRenderProgram();
-    	
-		// Set program handles for cube drawing.
-		scene_mvpMatrixUniform = GLES20.glGetUniformLocation(mActiveProgram, RenderConstants.MVP_MATRIX_UNIFORM);
-		scene_mvMatrixUniform = GLES20.glGetUniformLocation(mActiveProgram, RenderConstants.MV_MATRIX_UNIFORM);
-		scene_normalMatrixUniform = GLES20.glGetUniformLocation(mActiveProgram, RenderConstants.NORMAL_MATRIX_UNIFORM);
-		scene_lightPosUniform = GLES20.glGetUniformLocation(mActiveProgram, RenderConstants.LIGHT_POSITION_UNIFORM);
-		scene_schadowProjMatrixUniform = GLES20.glGetUniformLocation(mActiveProgram, RenderConstants.SHADOW_PROJ_MATRIX);
-		scene_textureUniform = GLES20.glGetUniformLocation(mActiveProgram, RenderConstants.SHADOW_TEXTURE);
-		scene_positionAttribute = GLES20.glGetAttribLocation(mActiveProgram, RenderConstants.POSITION_ATTRIBUTE);
-		scene_normalAttribute = GLES20.glGetAttribLocation(mActiveProgram, RenderConstants.NORMAL_ATTRIBUTE);
-		scene_colorAttribute = GLES20.glGetAttribLocation(mActiveProgram, RenderConstants.COLOR_ATTRIBUTE);
-		scene_mapStepXUniform = GLES20.glGetUniformLocation(mActiveProgram, RenderConstants.SHADOW_X_PIXEL_OFFSET);
-		scene_mapStepYUniform = GLES20.glGetUniformLocation(mActiveProgram, RenderConstants.SHADOW_Y_PIXEL_OFFSET);
-		
-		//shadow handles
-		int shadowMapProgram = mDepthMapProgram.getProgram();
-		shadow_mvpMatrixUniform = GLES20.glGetUniformLocation(shadowMapProgram, RenderConstants.MVP_MATRIX_UNIFORM);
-		shadow_positionAttribute = GLES20.glGetAttribLocation(shadowMapProgram, RenderConstants.SHADOW_POSITION_ATTRIBUTE);
-		
+
 		//display texture program handles (for debugging depth texture)
 		//texture_mvpMatrixUniform = GLES20.glGetUniformLocation(textureProgram, RenderConstants.MVP_MATRIX_UNIFORM);
 		//texture_positionAttribute = GLES20.glGetAttribLocation(textureProgram, RenderConstants.POSITION_ATTRIBUTE);
@@ -307,22 +319,19 @@ public class ShadowsRenderer implements GLSurfaceView.Renderer {
 
 		//--------------- calc values common for both renderers
 		
-		// light rotates around Y axis in every 12 seconds
-        long elapsedMilliSec = SystemClock.elapsedRealtime();
-        long rotationCounter = elapsedMilliSec % 12000L;
-        
-        float lightRotationDegree = (360.0f / 12000.0f) * ((int)rotationCounter);
-        
-        float[] rotationMatrix = new float[16];
-        
-        Matrix.setIdentityM(rotationMatrix, 0);
-        Matrix.rotateM(rotationMatrix, 0, lightRotationDegree, 0.0f, 1.0f, 0.0f);
+		// 光照旋转
+//        long elapsedMilliSec = SystemClock.elapsedRealtime();
+//        long rotationCounter = elapsedMilliSec % 12000L;
+//        float lightRotationDegree = (360.0f / 12000.0f) * ((int)rotationCounter);
+//        float[] rotationMatrix = new float[16];
+//        Matrix.setIdentityM(rotationMatrix, 0);
+//        Matrix.rotateM(rotationMatrix, 0, lightRotach.rendetionDegree, 0.0f, 1.0f, 0.0f);
+//        Matrix.multiplyMV(mActualLightPosition, 0, rotationMatrix, 0, mLightPosModel, 0);
 
-        Matrix.multiplyMV(mActualLightPosition, 0, rotationMatrix, 0, mLightPosModel, 0);
-	
+		//初始化模型矩阵
         Matrix.setIdentityM(mModelMatrix, 0);
         
-        //Set view matrix from light source position
+        //设置光照的viewMatrix , 把相机位置设置到光照位置
         Matrix.setLookAtM(mLightViewMatrix, 0,
         					//lightX, lightY, lightZ, 
         					mActualLightPosition[0], mActualLightPosition[1], mActualLightPosition[2],
@@ -333,13 +342,12 @@ public class ShadowsRenderer implements GLSurfaceView.Renderer {
         					//up vector in the direction of axisY
         					-mActualLightPosition[0], 0, -mActualLightPosition[2]);
         
-        //Cube rotation with touch events
+        //立方体旋转
         float[] cubeRotationX = new float[16];
         float[] cubeRotationY = new float[16];
         
         Matrix.setRotateM(cubeRotationX, 0, mRotationX, 0, 1.0f, 0);
         Matrix.setRotateM(cubeRotationY, 0, mRotationY, 1.0f, 0, 0);
-        
         Matrix.multiplyMM(mCubeRotation, 0, cubeRotationX, 0, cubeRotationY, 0);
         
         //------------------------- render depth map --------------------------
@@ -355,7 +363,7 @@ public class ShadowsRenderer implements GLSurfaceView.Renderer {
      	GLES20.glCullFace(GLES20.GL_BACK);
      	
      	renderScene();
-        
+
         // Print openGL errors to console
         int debugInfo = GLES20.glGetError();
 		
@@ -367,7 +375,7 @@ public class ShadowsRenderer implements GLSurfaceView.Renderer {
     }
 
     private void renderShadowMap() {
-    	// bind the generated framebuffer
+    	// 绑定FBO
     	GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, fboId[0]);
     	
 //		GLES20.glViewport(0, 0, mShadowMapWidth, mShadowMapHeight);
@@ -377,55 +385,45 @@ public class ShadowsRenderer implements GLSurfaceView.Renderer {
 		GLES20.glClear( GLES20.GL_DEPTH_BUFFER_BIT | GLES20.GL_COLOR_BUFFER_BIT);
 		
 		// Start using the shader
-		GLES20.glUseProgram(mDepthMapProgram.getProgram());
+		GLES20.glUseProgram(mDepthMapProgram);
 
 //		float[] tempResultMatrix = new float[16];
 		
-		// Calculate matrices for standing objects
-		
-		// View matrix * Model matrix value is stored
+		//生成光照位置的mvpMatrix设置到shader里面
 		Matrix.multiplyMM(mLightMvpMatrix_staticShapes, 0, mLightViewMatrix, 0, mModelMatrix, 0);
-
-		// Model * view * projection matrix stored and copied for use at rendering from camera point of view
 		Matrix.multiplyMM(mLightMvpMatrix_staticShapes, 0, mLightProjectionMatrix, 0, mLightMvpMatrix_staticShapes, 0);
-//		System.arraycopy(tempResultMatrix, 0, mLightMvpMatrix_staticShapes, 0, 16);
-		
-		// Pass in the combined matrix.
 		GLES20.glUniformMatrix4fv(shadow_mvpMatrixUniform, 1, false, mLightMvpMatrix_staticShapes, 0);
 
-		// Render all stationary shapes on scene
+		// 绘制场景，只需要绘制定点，其他不同处理，因为是影子，所以不需要纹理和颜色等其他数据
+		//static shadow
 		mPlane.render(shadow_positionAttribute, 0, 0, true);
-//		mSmallCube0.render(shadow_positionAttribute, 0, 0, true);
-//		mSmallCube1.render(shadow_positionAttribute, 0, 0, true);
-//		mSmallCube2.render(shadow_positionAttribute, 0, 0, true);
-//		mSmallCube3.render(shadow_positionAttribute, 0, 0, true);
+		mSmallCube0.render(shadow_positionAttribute, 0, 0, true);
+		mSmallCube1.render(shadow_positionAttribute, 0, 0, true);
+		mSmallCube2.render(shadow_positionAttribute, 0, 0, true);
+		mSmallCube3.render(shadow_positionAttribute, 0, 0, true);
+//		ch.render(shadow_positionAttribute, 0, 0, true);
 		
 		// Calculate matrices for moving objects
 		
-		// Rotate the model matrix with current rotation matrix
+		//立方体旋转的时候影子也发生变化，所以上面旋转立方体的旋转矩阵需要在这里再计算一次，
+		// 然后再计算出最终的mvpMatrix传入到shader里面
 		Matrix.multiplyMM(mLightMvpMatrix_dynamicShapes, 0, mModelMatrix, 0, mCubeRotation, 0);
-		
-		// View matrix * Model matrix value is stored
 		Matrix.multiplyMM(mLightMvpMatrix_dynamicShapes, 0, mLightViewMatrix, 0, mLightMvpMatrix_dynamicShapes, 0);
-
-		// Model * view * projection matrix stored and copied for use at rendering from camera point of view
 		Matrix.multiplyMM(mLightMvpMatrix_dynamicShapes, 0, mLightProjectionMatrix, 0, mLightMvpMatrix_dynamicShapes, 0);
-//		System.arraycopy(tempResultMatrix, 0, mLightMvpMatrix_dynamicShapes, 0, 16);
-		
-		// Pass in the combined matrix.
 		GLES20.glUniformMatrix4fv(shadow_mvpMatrixUniform, 1, false, mLightMvpMatrix_dynamicShapes, 0);
-		
-		// Render all moving shapes on scene
+
+		//绘制动态的物体的影子
 		mCube.render(shadow_positionAttribute, 0, 0, true);
 	}
-    
+
+	//绘制物体
     private void renderScene() {
-    	// bind default framebuffer
+    	// 初始化FBO
 		GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
 		
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 		
-		GLES20.glUseProgram(mActiveProgram);
+		GLES20.glUseProgram(mPCFShadowDynamicBiasProgram);
 		
 		GLES20.glViewport(0, 0, mDisplayWidth, mDisplayHeight);
 		
@@ -480,9 +478,10 @@ public class ShadowsRenderer implements GLSurfaceView.Renderer {
  		GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
  		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, renderTextureId[0]);
  		GLES20.glUniform1i(scene_textureUniform, 0);
- 		
+
         mSmallCube0.render(scene_positionAttribute, scene_normalAttribute, scene_colorAttribute, false);
         mSmallCube1.render(scene_positionAttribute, scene_normalAttribute, scene_colorAttribute, false);
+//		ch.render(scene_positionAttribute, scene_normalAttribute, scene_colorAttribute, false);
         mSmallCube2.render(scene_positionAttribute, scene_normalAttribute, scene_colorAttribute, false);
         mSmallCube3.render(scene_positionAttribute, scene_normalAttribute, scene_colorAttribute, false);
         mPlane.render(scene_positionAttribute, scene_normalAttribute, scene_colorAttribute,false);
@@ -531,9 +530,9 @@ public class ShadowsRenderer implements GLSurfaceView.Renderer {
     /**
      * Changes render program after changes in menu
      */
-    private void setRenderProgram() {
-				mActiveProgram = mPCFShadowDynamicBiasProgram.getProgram();
-	}
+//    private void setRenderProgram() {
+//				mActiveProgram = mPCFShadowDynamicBiasProgram.getProgram();
+//	}
 
     /**
      * Returns the X rotation angle of the cube.

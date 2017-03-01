@@ -6,8 +6,8 @@ precision highp float;
 uniform mat4 uMVPMatrix;
 
 // position of the vertices
-attribute vec4 aShadowPosition; 
+attribute vec4 aShadowPosition;
 
 void main() {
-	gl_Position = uMVPMatrix * aShadowPosition; 
+	gl_Position = uMVPMatrix * aShadowPosition;
 }

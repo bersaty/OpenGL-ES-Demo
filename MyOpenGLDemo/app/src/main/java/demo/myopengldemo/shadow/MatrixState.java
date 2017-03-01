@@ -5,202 +5,191 @@ import android.opengl.Matrix;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
-import java.util.Stack;
 
-//å­˜å‚¨ç³»ç»ŸçŸ©é˜µçŠ¶æ€çš„ç±»
-public class MatrixState
+//´æ´¢ÏµÍ³¾ØÕó×´Ì¬µÄÀà
+public class MatrixState 
 {
-    private static float[] mProjMatrix = new float[16];//4x4çŸ©é˜µ æŠ•å½±ç”¨
-    private static float[] mVMatrix = new float[16];//æ‘„åƒæœºä½ç½®æœå‘9å‚æ•°çŸ©é˜µ
-    private static float[] currMatrix;//å½“å‰å˜æ¢çŸ©é˜µ
-    public static float[] lightLocation=new float[]{0,0,0};//å®šä½å…‰å…‰æºä½ç½®
-
-    public static float[] mLightProjMatrix = new float[16];//å…‰æºè§†è§’çš„æŠ•å½±çŸ©é˜µ
-    public static float[] mLightVMatrix = new float[16];//å…‰æºè§†è§’çš„è§†å›¾çŸ©é˜µ
-
+	private static float[] mProjMatrix = new float[16];//4x4¾ØÕó Í¶Ó°ÓÃ
+    private static float[] mVMatrix = new float[16];//ÉãÏñ»úÎ»ÖÃ³¯Ïò9²ÎÊı¾ØÕó   
+    private static float[] currMatrix;//µ±Ç°±ä»»¾ØÕó
+    public static float[] lightLocation=new float[]{0,0,0};//¶¨Î»¹â¹âÔ´Î»ÖÃ
     public static FloatBuffer cameraFB;
-    public static FloatBuffer lightCameraFB;
     public static FloatBuffer lightPositionFB;
-
-    public static Stack<float[]> mStack=new Stack<float[]>();//ä¿æŠ¤å˜æ¢çŸ©é˜µçš„æ ˆ
-
-    public static void setInitStack()//è·å–ä¸å˜æ¢åˆå§‹çŸ©é˜µ
+    
+    //±£»¤±ä»»¾ØÕóµÄÕ»
+    static float[][] mStack=new float[10][16];
+    static int stackTop=-1;
+    
+    public static void setInitStack()//»ñÈ¡²»±ä»»³õÊ¼¾ØÕó
     {
-        currMatrix=new float[16];
-        Matrix.setRotateM(currMatrix, 0, 0, 1, 0, 0);
+    	currMatrix=new float[16];
+    	Matrix.setRotateM(currMatrix, 0, 0, 1, 0, 0);
     }
-
-    public static void pushMatrix()//ä¿æŠ¤å˜æ¢çŸ©é˜µ
+    
+    public static void pushMatrix()//±£»¤±ä»»¾ØÕó
     {
-        mStack.push(currMatrix.clone());
+    	stackTop++;
+    	for(int i=0;i<16;i++)
+    	{
+    		mStack[stackTop][i]=currMatrix[i];
+    	}
     }
-
-    public static void popMatrix()//æ¢å¤å˜æ¢çŸ©é˜µ
+    
+    public static void popMatrix()//»Ö¸´±ä»»¾ØÕó
     {
-        currMatrix=mStack.pop();
+    	for(int i=0;i<16;i++)
+    	{
+    		currMatrix[i]=mStack[stackTop][i];
+    	}
+    	stackTop--;
     }
-
-    public static void translate(float x,float y,float z)//è®¾ç½®æ²¿xyzè½´ç§»åŠ¨
+    
+    public static void translate(float x,float y,float z)//ÉèÖÃÑØxyzÖáÒÆ¶¯
     {
-        Matrix.translateM(currMatrix, 0, x, y, z);
+    	Matrix.translateM(currMatrix, 0, x, y, z);
     }
-
-    public static void rotate(float angle,float x,float y,float z)//è®¾ç½®ç»•xyzè½´ç§»åŠ¨
+    
+    public static void rotate(float angle,float x,float y,float z)//ÉèÖÃÈÆxyzÖáÒÆ¶¯
     {
-        Matrix.rotateM(currMatrix,0,angle,x,y,z);
+    	Matrix.rotateM(currMatrix,0,angle,x,y,z);
     }
-
+    
     public static void scale(float x,float y,float z)
     {
-        Matrix.scaleM(currMatrix,0, x, y, z);
+    	Matrix.scaleM(currMatrix,0, x, y, z);
     }
-
-
-    //è®¾ç½®æ‘„åƒæœº
+    
+    
+    //ÉèÖÃÉãÏñ»ú
     public static void setCamera
     (
-            float cx,	//æ‘„åƒæœºä½ç½®x
-            float cy,   //æ‘„åƒæœºä½ç½®y
-            float cz,   //æ‘„åƒæœºä½ç½®z
-            float tx,   //æ‘„åƒæœºç›®æ ‡ç‚¹x
-            float ty,   //æ‘„åƒæœºç›®æ ‡ç‚¹y
-            float tz,   //æ‘„åƒæœºç›®æ ‡ç‚¹z
-            float upx,  //æ‘„åƒæœºUPå‘é‡Xåˆ†é‡
-            float upy,  //æ‘„åƒæœºUPå‘é‡Yåˆ†é‡
-            float upz   //æ‘„åƒæœºUPå‘é‡Zåˆ†é‡
+    		float cx,	//ÉãÏñ»úÎ»ÖÃx
+    		float cy,   //ÉãÏñ»úÎ»ÖÃy
+    		float cz,   //ÉãÏñ»úÎ»ÖÃz
+    		float tx,   //ÉãÏñ»úÄ¿±êµãx
+    		float ty,   //ÉãÏñ»úÄ¿±êµãy
+    		float tz,   //ÉãÏñ»úÄ¿±êµãz
+    		float upx,  //ÉãÏñ»úUPÏòÁ¿X·ÖÁ¿
+    		float upy,  //ÉãÏñ»úUPÏòÁ¿Y·ÖÁ¿
+    		float upz   //ÉãÏñ»úUPÏòÁ¿Z·ÖÁ¿		
     )
     {
-        Matrix.setLookAtM
-                (
-                        mVMatrix,
-                        0,
-                        cx,
-                        cy,
-                        cz,
-                        tx,
-                        ty,
-                        tz,
-                        upx,
-                        upy,
-                        upz
-                );
-
-        float[] cameraLocation=new float[3];//æ‘„åƒæœºä½ç½®
-        cameraLocation[0]=cx;
-        cameraLocation[1]=cy;
-        cameraLocation[2]=cz;
-
-        ByteBuffer llbb = ByteBuffer.allocateDirect(3*4);
-        llbb.order(ByteOrder.nativeOrder());//è®¾ç½®å­—èŠ‚é¡ºåº
+    	Matrix.setLookAtM
+        (
+        		mVMatrix, 
+        		0, 
+        		cx,
+        		cy,
+        		cz,
+        		tx,
+        		ty,
+        		tz,
+        		upx,
+        		upy,
+        		upz
+        );
+    	
+    	float[] cameraLocation=new float[3];//ÉãÏñ»úÎ»ÖÃ
+    	cameraLocation[0]=cx;
+    	cameraLocation[1]=cy;
+    	cameraLocation[2]=cz;
+    	
+    	ByteBuffer llbb = ByteBuffer.allocateDirect(3*4);
+        llbb.order(ByteOrder.nativeOrder());//ÉèÖÃ×Ö½ÚË³Ğò
         cameraFB=llbb.asFloatBuffer();
         cameraFB.put(cameraLocation);
-        cameraFB.position(0);
+        cameraFB.position(0);  
     }
-
-    //è®¾ç½®æ‘„åƒæœºåˆ°å…‰æºä½ç½®
-    public static void setCameraToLight()
-    {
-        Matrix.setLookAtM
-                (
-                        mLightVMatrix,
-                        0,
-                        lightLocation[0],
-                        lightLocation[0],
-                        lightLocation[0],
-                        lightLocation[0],
-                        -lightLocation[0],
-                        lightLocation[0],
-                        -lightLocation[0],
-                        lightLocation[0],
-                        -lightLocation[0]
-                );
-
-        float[] cameraLocation=new float[3];//æ‘„åƒæœºä½ç½®
-        cameraLocation[0]=lightLocation[0];
-        cameraLocation[1]=lightLocation[1];
-        cameraLocation[2]=lightLocation[2];
-
-        ByteBuffer llbb = ByteBuffer.allocateDirect(3*4);
-        llbb.order(ByteOrder.nativeOrder());//è®¾ç½®å­—èŠ‚é¡ºåº
-        cameraFB=llbb.asFloatBuffer();
-        cameraFB.put(cameraLocation);
-        cameraFB.position(0);
-    }
-
-    //è®¾ç½®é€è§†æŠ•å½±å‚æ•°
+    //»ñÈ¡ÉãÏñ»ú¾ØÕóµÄÄæ¾ØÕóµÄ·½·¨
+	public static float[] getInvertMvMatrix(){
+		float[] invM = new float[16];
+		Matrix.invertM(invM, 0, mVMatrix, 0);//ÇóÄæ¾ØÕó
+		return invM;
+	}
+	//Í¨¹ıÉãÏñ»ú±ä»»ºóµÄµãÇó±ä»»Ç°µÄµãµÄ·½·¨£º³ËÒÔÉãÏñ»ú¾ØÕóµÄÄæ¾ØÕó
+	public static float[] fromPtoPreP(float[] p){
+		//Í¨¹ıÄæ±ä»»£¬µÃµ½±ä»»Ö®Ç°µÄµã
+		float[] inverM = getInvertMvMatrix();//»ñÈ¡Äæ±ä»»¾ØÕó
+		float[] preP = new float[4];
+		Matrix.multiplyMV(preP, 0, inverM, 0, new float[]{p[0],p[1],p[2],1}, 0);//Çó±ä»»Ç°µÄµã
+		return new float[]{preP[0],preP[1],preP[2]};//±ä»»Ç°µÄµã¾ÍÊÇ±ä»»Ö®Ç°µÄ·¨ÏòÁ¿
+	}
+	
+    //ÉèÖÃÍ¸ÊÓÍ¶Ó°²ÎÊı
     public static void setProjectFrustum
     (
-            float left,		//nearé¢çš„left
-            float right,    //nearé¢çš„right
-            float bottom,   //nearé¢çš„bottom
-            float top,      //nearé¢çš„top
-            float near,		//nearé¢è·ç¦»
-            float far       //faré¢è·ç¦»
+    	float left,		//nearÃæµÄleft
+    	float right,    //nearÃæµÄright
+    	float bottom,   //nearÃæµÄbottom
+    	float top,      //nearÃæµÄtop
+    	float near,		//nearÃæ¾àÀë
+    	float far       //farÃæ¾àÀë
     )
     {
-        Matrix.frustumM(mProjMatrix, 0, left, right, bottom, top, near, far);
+    	Matrix.frustumM(mProjMatrix, 0, left, right, bottom, top, near, far);
     }
-
-    //è®¾ç½®å…‰æºçš„é€è§†æŠ•å½±å‚æ•°
-    public static void setLightProjectFrustum
-    (
-            float left,		//nearé¢çš„left
-            float right,    //nearé¢çš„right
-            float bottom,   //nearé¢çš„bottom
-            float top,      //nearé¢çš„top
-            float near,		//nearé¢è·ç¦»
-            float far       //faré¢è·ç¦»
-    )
-    {
-        Matrix.frustumM(mLightProjMatrix, 0, left, right, bottom, top, near, far);
-    }
-
-    //è®¾ç½®æ­£äº¤æŠ•å½±å‚æ•°
+    
+    //ÉèÖÃÕı½»Í¶Ó°²ÎÊı
     public static void setProjectOrtho
     (
-            float left,		//nearé¢çš„left
-            float right,    //nearé¢çš„right
-            float bottom,   //nearé¢çš„bottom
-            float top,      //nearé¢çš„top
-            float near,		//nearé¢è·ç¦»
-            float far       //faré¢è·ç¦»
+    	float left,		//nearÃæµÄleft
+    	float right,    //nearÃæµÄright
+    	float bottom,   //nearÃæµÄbottom
+    	float top,      //nearÃæµÄtop
+    	float near,		//nearÃæ¾àÀë
+    	float far       //farÃæ¾àÀë
     )
-    {
-        Matrix.orthoM(mProjMatrix, 0, left, right, bottom, top, near, far);
-    }
-
-    //è·å–å…·ä½“ç‰©ä½“çš„æ€»å˜æ¢çŸ©é˜µ
+    {    	
+    	Matrix.orthoM(mProjMatrix, 0, left, right, bottom, top, near, far);
+    }   
+   
+    //»ñÈ¡¾ßÌåÎïÌåµÄ×Ü±ä»»¾ØÕó
     public static float[] getFinalMatrix()
     {
-        float[] mMVPMatrix=new float[16];
-        Matrix.multiplyMM(mMVPMatrix, 0, mVMatrix, 0, currMatrix, 0);
+    	float[] mMVPMatrix=new float[16];
+    	Matrix.multiplyMM(mMVPMatrix, 0, mVMatrix, 0, currMatrix, 0);
         Matrix.multiplyMM(mMVPMatrix, 0, mProjMatrix, 0, mMVPMatrix, 0);
         return mMVPMatrix;
     }
-
-    //è·å–å…·ä½“ç‰©ä½“çš„å˜æ¢çŸ©é˜µ
+    
+    //»ñÈ¡¾ßÌåÎïÌåµÄ±ä»»¾ØÕó
     public static float[] getMMatrix()
-    {
+    {       
         return currMatrix;
     }
-
-    //è®¾ç½®ç¯å…‰ä½ç½®çš„æ–¹æ³•
+    
+    //ÉèÖÃµÆ¹âÎ»ÖÃµÄ·½·¨
     public static void setLightLocation(float x,float y,float z)
     {
-        lightLocation[0]=x;
-        lightLocation[1]=y;
-        lightLocation[2]=z;
-        ByteBuffer llbb = ByteBuffer.allocateDirect(3*4);
-        llbb.order(ByteOrder.nativeOrder());//è®¾ç½®å­—èŠ‚é¡ºåº
+    	lightLocation[0]=x;
+    	lightLocation[1]=y;
+    	lightLocation[2]=z;
+    	ByteBuffer llbb = ByteBuffer.allocateDirect(3*4);
+        llbb.order(ByteOrder.nativeOrder());//ÉèÖÃ×Ö½ÚË³Ğò
         lightPositionFB=llbb.asFloatBuffer();
         lightPositionFB.put(lightLocation);
         lightPositionFB.position(0);
     }
-
+    
     public static float[] getViewProjMatrix()
     {
-        float[] mMVPMatrix=new float[16];
-        Matrix.multiplyMM(mMVPMatrix, 0, mProjMatrix, 0, mVMatrix, 0);
+    	float[] mMVPMatrix=new float[16];
+    	Matrix.multiplyMM(mMVPMatrix, 0, mProjMatrix, 0, mVMatrix, 0);
         return mMVPMatrix;
     }
+
+	//return view * model
+	public static float[] getVMMatrix(){
+		float[] mMVMatrix=new float[16];
+		Matrix.multiplyMM(mMVMatrix,0,mVMatrix,0,currMatrix,0);
+		return mMVMatrix;
+	}
+
+	//return zhe light location in eye space , view * lightLocation
+	public static float[] getLightLocationIneyeSpace(){
+		float[] lightIneyeSpace = new float[4];
+		float[] lightposition = new float[]{lightLocation[0],lightLocation[1],lightLocation[2],1.0f};
+		Matrix.multiplyMV(lightIneyeSpace,0,mVMatrix,0,lightposition,0);
+		return lightIneyeSpace;
+	}
 }

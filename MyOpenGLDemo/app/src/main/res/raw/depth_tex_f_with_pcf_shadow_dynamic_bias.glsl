@@ -24,7 +24,7 @@ varying vec3 vNormal;
   
 // shadow coordinates
 varying vec4 vShadowCoord;
-  
+
 //Calculate variable bias - from http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-16-shadow-mapping
 float calcBias()
 {
@@ -114,5 +114,6 @@ void main()
 	}
 
 	// Final output color with shadow and lighting
-    gl_FragColor = (vColor * (diffuseComponent + ambientComponent) * shadow);                                  		
+    gl_FragColor = (vColor * (diffuseComponent + ambientComponent) * shadow);
+//     gl_FragColor = (vColor * (0.2 + ambientComponent) * shadow);
 }                                                                     	
