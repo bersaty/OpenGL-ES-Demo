@@ -29,13 +29,7 @@ import javax.vecmath.Vector3f;
 
 import demo.myopengldemo.R;
 
-import static demo.myopengldemo.Sample6_1.Constant.EYE_X;
-import static demo.myopengldemo.Sample6_1.Constant.EYE_Y;
-import static demo.myopengldemo.Sample6_1.Constant.EYE_Z;
 import static demo.myopengldemo.Sample6_1.Constant.MAX_SUB_STEPS;
-import static demo.myopengldemo.Sample6_1.Constant.TARGET_X;
-import static demo.myopengldemo.Sample6_1.Constant.TARGET_Y;
-import static demo.myopengldemo.Sample6_1.Constant.TARGET_Z;
 import static demo.myopengldemo.Sample6_1.Constant.TIME_STEP;
 
 class MySurfaceView extends GLSurfaceView
@@ -68,8 +62,8 @@ class MySurfaceView extends GLSurfaceView
 		//创建碰撞检测算法分配者对象，其功能为扫描所有的碰撞检测对，并确定适用的检测策略对应的算法
 		CollisionDispatcher dispatcher = new CollisionDispatcher(collisionConfiguration);		
 		//设置整个物理世界的边界信息
-		Vector3f worldAabbMin = new Vector3f(-10000, -10000, -10000);
-		Vector3f worldAabbMax = new Vector3f(10000, 10000, 10000);
+		Vector3f worldAabbMin = new Vector3f(-1, -1, -1);
+		Vector3f worldAabbMax = new Vector3f(1, 1, 1);
 		int maxProxies = 1024;
 		//创建碰撞检测粗测阶段的加速算法对象
 		AxisSweep3 overlappingPairCache =new AxisSweep3(worldAabbMin, worldAabbMax, maxProxies);
@@ -131,14 +125,14 @@ class MySurfaceView extends GLSurfaceView
             //初始化变换矩阵
             MatrixState.setInitStack();
             MatrixState.setCamera( 
-            		EYE_X,   //人眼位置的X
-            		EYE_Y, 	//人眼位置的Y
-            		EYE_Z,   //人眼位置的Z
-            		TARGET_X, 	//人眼球看的点X
-            		TARGET_Y,   //人眼球看的点Y
-            		TARGET_Z,   //人眼球看的点Z
-            		0, 
-            		1, 
+            		3,   //人眼位置的X
+            		30, 	//人眼位置的Y
+            		3,   //人眼位置的Z
+            		1, 	//人眼球看的点X
+            		1,   //人眼球看的点Y
+            		-3,   //人眼球看的点Z
+            		0,
+            		1,
             		0);
             //初始化所用到的shader程序
             ShaderManager.loadCodeFromFile(activity.getResources());
@@ -186,8 +180,8 @@ class MySurfaceView extends GLSurfaceView
             	public void run()
             	{
             		while(true)
-            		{            			
-            			try 
+            		{
+            			try
             			{
             				synchronized(tcaForAdd)//锁定新箱子所在集合
             	            {
@@ -197,9 +191,9 @@ class MySurfaceView extends GLSurfaceView
                 	                {
                 	            		tca.add(tc);  //向箱子集合中添加箱子
                 	                }
-            					}            	            	
+            					}
             	            	tcaForAdd.clear();		//将新箱子的集合清空
-            	            }           
+            	            }
             				//开始模拟
                 			dynamicsWorld.stepSimulation(TIME_STEP, MAX_SUB_STEPS);
 							Thread.sleep(20);	//当前线程睡眠20毫秒

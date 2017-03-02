@@ -3,9 +3,18 @@ package demo.myopengldemo.mydice;
 import android.content.Context;
 import android.opengl.GLES20;
 
+import com.bulletphysics.collision.shapes.CollisionShape;
+import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
+import com.bulletphysics.dynamics.RigidBody;
+import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
+import com.bulletphysics.linearmath.DefaultMotionState;
+import com.bulletphysics.linearmath.Transform;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+
+import javax.vecmath.Vector3f;
 
 import demo.myopengldemo.R;
 
@@ -34,28 +43,46 @@ public class Background {
     private int mProgram;
     private Context mContext;
 
-    public Background(Context context){
+    public Background(Context context,float yOffset,CollisionShape groundShape,DiscreteDynamicsWorld dynamicsWorld){
         mContext = context;
+
+        //创建刚体的初始变换对象
+        Transform groundTransform = new Transform();
+        groundTransform.setIdentity();
+        groundTransform.origin.set(new Vector3f(0.f, yOffset, 0.f));
+        Vector3f localInertia = new Vector3f(0, 0, 0);//惯性
+        //创建刚体的运动状态对象
+        DefaultMotionState myMotionState = new DefaultMotionState(groundTransform);
+        //创建刚体信息对象
+        RigidBodyConstructionInfo rbInfo = new RigidBodyConstructionInfo(0, myMotionState, groundShape, localInertia);
+        //创建刚体
+        RigidBody body = new RigidBody(rbInfo);
+        //设置反弹系数
+        body.setRestitution(0.2f);
+        //设置摩擦系数
+        body.setFriction(2.0f);
+        //将刚体添加进物理世界
+        dynamicsWorld.addRigidBody(body);
+
         initData();
         initShader();
     }
 
     //初始化数据
     private void initData(){
-        // 平面顶点坐标，需要旋转一下，这些顶点z轴都为0
         final float[] VerticesData = {
                 // X, Y, Z,
-                -60.0f, -30.0f, 0.0f,
+                -60.0f, 0.0f, -30.0f,
 
-                60.0f, -30.0f, 0.0f,
+                60.0f,  0.0f,-30.0f,
 
-                60.0f, 30.0f, 0.0f,
+                60.0f,  0.0f,30.0f,
 
-                -60.0f, -30.0f, 0.0f,
+                -60.0f, 0.0f, -30.0f,
 
-                60.0f, 30.0f, 0.0f,
+                60.0f,  0.0f,30.0f,
 
-                -60.0f, 30.0f, 0.0f,
+                -60.0f, 0.0f, 30.0f,
         };
 
         final float[] TextureCoordinateData = {
