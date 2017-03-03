@@ -72,8 +72,8 @@ public class Dice {
         RigidBodyConstructionInfo rbInfo = new RigidBodyConstructionInfo
                 (mass, myMotionState, colShape, localInertia);
         body = new RigidBody(rbInfo);//创建刚体
-        body.setRestitution(0.2f);//设置反弹系数
-        body.setFriction(2.0f);//设置摩擦系数
+        body.setRestitution(0.6f);//设置反弹系数
+        body.setFriction(1.0f);//设置摩擦系数
         dynamicsWorld.addRigidBody(body);//将刚体添加进物理世界
     }
 

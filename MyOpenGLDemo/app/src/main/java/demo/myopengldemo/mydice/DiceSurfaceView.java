@@ -67,7 +67,6 @@ public class DiceSurfaceView extends GLSurfaceView {
     CollisionShape planeShape;//共用的平面形状
     DiscreteDynamicsWorld dynamicsWorld;//世界对象
     Dice mDice;//骰子
-    Dice mDice2;//骰子
 
     ArrayList<Dice> mDiceList = new ArrayList<>();
 
@@ -88,12 +87,11 @@ public class DiceSurfaceView extends GLSurfaceView {
             public void onSensorChanged(SensorEvent event) {
 
                 float[] value = event.values;
+
                 mAx = value[0];
                 mAy = value[1];
                 mAz = value[2];
-                Log.i("wch sensorchange ax = ",mAx+ "  ~~~");
-                Log.i("wch sensorchange ay = ",mAy+ "  ~~~");
-                Log.i("wch sensorchange az = ",mAz+ "  ~~~");
+
             }
 
             @Override
@@ -156,7 +154,8 @@ public class DiceSurfaceView extends GLSurfaceView {
                             if (body.isActive() == false) {
                                 body.activate();
                             }
-                            body.setLinearVelocity(new Vector3f(0, 40.0f, 0));
+                            body.setLinearVelocity(new Vector3f(0, 50.0f, 0));
+
                             body.setAngularVelocity(new Vector3f(1, 1, 1));
 //                        GImpactCollisionAlgorithm.registerAlgorithm(dispatcher);
                         }
@@ -316,11 +315,11 @@ public class DiceSurfaceView extends GLSurfaceView {
             MatrixState.setInitStack();
 
             CollisionShape planeShape1;
-            planeShape1=new StaticPlaneShape(new Vector3f(1, 0, 0), -11);
+            planeShape1=new StaticPlaneShape(new Vector3f(1, 0, 0), -10);
             Background mBackground1 = new Background(getContext(),0.0f,planeShape1,dynamicsWorld);
 
             CollisionShape planeShape2;
-            planeShape2=new StaticPlaneShape(new Vector3f(-1, 0, 0), -11);
+            planeShape2=new StaticPlaneShape(new Vector3f(-1, 0, 0), -10);
             Background mBackground2 = new Background(getContext(),0.0f,planeShape2,dynamicsWorld);
 
             CollisionShape planeShape3;
@@ -339,7 +338,7 @@ public class DiceSurfaceView extends GLSurfaceView {
             mBackground = new Background(getContext(),0.0f,planeShape,dynamicsWorld);
 
 
-            for(int i = 0;i<4;i++) {
+            for(int i = 0;i<6;i++) {
                 mDice = LoadUtil.loadDiceObj("cube.obj", getResources(), getContext());
                 mDice.init(boxShape, dynamicsWorld, 1, i*2, 3, 0);
                 //使得立方体一开始是不激活的
@@ -361,17 +360,25 @@ public class DiceSurfaceView extends GLSurfaceView {
                         try
                         {
                             dynamicsWorld.stepSimulation(1.0f/60, 5);
-//                            for(Dice di:mDiceList){
-//                                synchronized (di) {
-//                                    RigidBody body = di.body;
-//                                    if (body.isActive() == false) {
+                            for(Dice di:mDiceList){
+                                synchronized (di) {
+                                    RigidBody body = di.body;
+                                    if (body.isActive() == false) {
 //                                        body.activate();
-//                                    }
-//                                    body.setLinearVelocity(new Vector3f(mAy, -mAz, mAx));
-//                                    body.setAngularVelocity(new Vector3f(2, 1, 0));
-////                        GImpactCollisionAlgorithm.registerAlgorithm(dispatcher);
-//                                }
-//                            }
+                                    }
+
+                                    Vector3f out = new Vector3f();
+                                    body.getLinearVelocity(out);
+
+                                    out.x += Math.round(mAy/4);
+                                    out.z += Math.round(mAx/4);
+                                    out.y -= Math.round(mAz/4);
+
+                                    body.setLinearVelocity(out);
+//                                    body.setAngularVelocity(new Vector3f(0, 0, 0));
+//                        GImpactCollisionAlgorithm.registerAlgorithm(dispatcher);
+                                }
+                            }
 
                             Thread.sleep(20);	//当前线程睡眠20毫秒
 

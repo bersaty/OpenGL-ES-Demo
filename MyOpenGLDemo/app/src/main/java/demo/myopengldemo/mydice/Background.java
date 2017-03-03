@@ -58,9 +58,9 @@ public class Background {
         //创建刚体
         RigidBody body = new RigidBody(rbInfo);
         //设置反弹系数
-        body.setRestitution(0.2f);
+        body.setRestitution(0.5f);
         //设置摩擦系数
-        body.setFriction(2.0f);
+        body.setFriction(.4f);
         //将刚体添加进物理世界
         dynamicsWorld.addRigidBody(body);
 
