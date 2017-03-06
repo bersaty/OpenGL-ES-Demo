@@ -40,6 +40,7 @@ public class DiceSurfaceView extends GLSurfaceView {
 
     Sensor mAccelerSensor;//加速度传感器
     float mAx,mAy,mAz;//三个坐标分量加速度
+    float mDx,mDy,mDz;//三个坐标分量速度增量
 
     private float mPreviousY;//上次的触控位置Y坐标
     private float mPreviousX;//上次的触控位置X坐标
@@ -87,6 +88,10 @@ public class DiceSurfaceView extends GLSurfaceView {
             public void onSensorChanged(SensorEvent event) {
 
                 float[] value = event.values;
+
+                mDx = Math.abs(mAx-value[0]);
+                mDy = Math.abs(mAy-value[1]);
+                mDz = Math.abs(mAz-value[2]);
 
                 mAx = value[0];
                 mAy = value[1];
@@ -370,9 +375,24 @@ public class DiceSurfaceView extends GLSurfaceView {
                                     Vector3f out = new Vector3f();
                                     body.getLinearVelocity(out);
 
-                                    out.x += Math.round(mAy/4);
-                                    out.z += Math.round(mAx/4);
-                                    out.y -= Math.round(mAz/4);
+                                    float deltaX,deltaY,deltaZ;
+
+                                    deltaX = mAx;
+                                    deltaY = mAy;
+                                    deltaZ = mAz;
+
+                                    if(mDx < 0.4f)
+                                        deltaX = 0;
+                                    if(mDy < 0.4f)
+                                        deltaY = 0;
+                                    if(mDz < 0.4f) {
+                                         deltaZ = 0;
+                                    }
+                                    Log.i("wch out = ",out.toString()+ "~~~~~");
+
+                                    out.x += deltaY;
+                                    out.z += deltaX;
+//                                    out.y -= deltaZ;
 
                                     body.setLinearVelocity(out);
 //                                    body.setAngularVelocity(new Vector3f(0, 0, 0));
