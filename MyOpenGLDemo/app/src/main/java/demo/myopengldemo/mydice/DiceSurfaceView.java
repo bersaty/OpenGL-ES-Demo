@@ -338,7 +338,7 @@ public class DiceSurfaceView extends GLSurfaceView {
                 mDice = LoadUtil.loadDiceObj("dice_1000.obj", getResources(), getContext());
                 mDice.init(boxShape, dynamicsWorld, 1, i*2, 3, 0);
                 //使得立方体一开始是不激活的
-                mDice.body.forceActivationState(RigidBody.WANTS_DEACTIVATION);
+//                mDice.body.forceActivationState(RigidBody.WANTS_DEACTIVATION);
                 mDiceList.add(mDice);
             }
 
