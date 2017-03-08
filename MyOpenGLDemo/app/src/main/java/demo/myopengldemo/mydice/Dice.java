@@ -48,9 +48,9 @@ public class Dice {
 
     public RigidBody body;//对应的刚体对象
 
-    public Dice(Context context,float[] verticesData,float[] verticesNormalData){
+    public Dice(Context context,float[] verticesData,float[] verticesNormalData,float[] textureCoordinateData){
         mContext = context;
-        initData(verticesData,verticesNormalData);
+        initData(verticesData,verticesNormalData,textureCoordinateData);
         initShader();
     }
 
@@ -72,12 +72,14 @@ public class Dice {
         RigidBodyConstructionInfo rbInfo = new RigidBodyConstructionInfo
                 (mass, myMotionState, colShape, localInertia);
         body = new RigidBody(rbInfo);//创建刚体
-        body.setRestitution(0.6f);//设置反弹系数
-        body.setFriction(1.0f);//设置摩擦系数
+        body.setRestitution(0.3f);//设置反弹系数
+        body.setFriction(2.0f);//设置摩擦系数
+
         dynamicsWorld.addRigidBody(body);//将刚体添加进物理世界
+
     }
 
-    public void initData(float[] verticesData,float[] verticesNormalData){
+    public void initData(float[] verticesData,float[] verticesNormalData,float[] textureCoordinateData){
 
         mVertexCount = verticesData.length/3;
 
@@ -90,15 +92,15 @@ public class Dice {
                 .order(ByteOrder.nativeOrder()).asFloatBuffer();
         mNormalBuffer.put(verticesNormalData).position(0);
 
-//        mVerticesTextureBuffer = ByteBuffer.allocateDirect(textureCoordinateData.length * 4)
-//                .order(ByteOrder.nativeOrder()).asFloatBuffer();
-//        mVerticesBuffer.put(textureCoordinateData).position(0);
+        mVerticesTextureBuffer = ByteBuffer.allocateDirect(textureCoordinateData.length * 4)
+                .order(ByteOrder.nativeOrder()).asFloatBuffer();
+        mVerticesTextureBuffer.put(textureCoordinateData).position(0);
     }
 
     private void initShader(){
         mProgram = MyGLUtils.buildProgram(mContext, R.raw.dice_scene_vertex, R.raw.dice_scene_frag);
 
-        mTextureId = MyGLUtils.loadTexture(mContext,R.drawable.wood_bin0,new int[2]);
+        mTextureId = MyGLUtils.loadTexture(mContext,R.drawable.touzi,new int[2]);
 
         mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");
         mModelMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMMatrix");
@@ -163,9 +165,19 @@ public class Dice {
                         3*4,
                         mNormalBuffer
                 );
-        //启用顶点位置、法向量数据
+        //纹理数据
+        GLES20.glVertexAttribPointer(
+                mTextureCoordinationHandle,
+                2,
+                GLES20.GL_FLOAT,
+                false,
+                2*4,
+                mVerticesTextureBuffer
+        );
+        //启用顶点位置、法向量、纹理坐标数据
         GLES20.glEnableVertexAttribArray(mPositionHandle);
         GLES20.glEnableVertexAttribArray(mNormalHandle);
+        GLES20.glEnableVertexAttribArray(mTextureCoordinationHandle);
 
         //设置纹理
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureId);

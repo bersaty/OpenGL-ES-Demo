@@ -58,9 +58,9 @@ public class Background {
         //创建刚体
         RigidBody body = new RigidBody(rbInfo);
         //设置反弹系数
-        body.setRestitution(0.5f);
+        body.setRestitution(0.3f);
         //设置摩擦系数
-        body.setFriction(.4f);
+        body.setFriction(2.0f);
         //将刚体添加进物理世界
         dynamicsWorld.addRigidBody(body);
 
@@ -72,17 +72,17 @@ public class Background {
     private void initData(){
         final float[] VerticesData = {
                 // X, Y, Z,
-                -60.0f, 0.0f, -30.0f,
+                -30.0f, 0.0f, -16.0f,
 
-                60.0f,  0.0f,-30.0f,
+                30.0f,  0.0f,-16.0f,
 
-                60.0f,  0.0f,30.0f,
+                30.0f,  0.0f,16.0f,
 
-                -60.0f, 0.0f, -30.0f,
+                -30.0f, 0.0f, -16.0f,
 
-                60.0f,  0.0f,30.0f,
+                30.0f,  0.0f,16.0f,
 
-                -60.0f, 0.0f, 30.0f,
+                -30.0f, 0.0f, 16.0f,
         };
 
         final float[] TextureCoordinateData = {
@@ -108,7 +108,7 @@ public class Background {
     private void initShader(){
         mProgram = MyGLUtils.buildProgram(mContext, R.raw.dice_bg_vertex, R.raw.dice_bg_fragment);
 
-        mTextureId = MyGLUtils.loadTexture(mContext,R.drawable.container_wood,new int[2]);
+        mTextureId = MyGLUtils.loadTexture(mContext,R.drawable.container_marble,new int[2]);
 
         // Set program handles. These will later be used to pass in values to the program.
         mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "u_MVPMatrix");

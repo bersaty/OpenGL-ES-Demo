@@ -7,7 +7,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
-import android.opengl.Matrix;
 import android.util.Log;
 import android.view.MotionEvent;
 
@@ -24,7 +23,6 @@ import com.bulletphysics.collision.shapes.StaticPlaneShape;
 import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
 import com.bulletphysics.dynamics.RigidBody;
 import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSolver;
-import com.bulletphysics.extras.gimpact.GImpactCollisionAlgorithm;
 
 import java.util.ArrayList;
 
@@ -37,6 +35,8 @@ import javax.vecmath.Vector3f;
 public class DiceSurfaceView extends GLSurfaceView {
     private final float TOUCH_SCALE_FACTOR = 180.0f/320;//角度缩放比例
     private DiceRenderer mRenderer;//场景渲染器
+    SensorManager mSensorManager;
+    SensorEventListener mSensorEventListener;
 
     Sensor mAccelerSensor;//加速度传感器
     float mAx,mAy,mAz;//三个坐标分量加速度
@@ -52,7 +52,7 @@ public class DiceSurfaceView extends GLSurfaceView {
     float tx=0;//目标点x位置
     float ty=0;//目标点y位置
     float tz=0;//目标点z位置
-    public float currSightDis=60;//摄像机和目标的距离
+    public float currSightDis=30;//摄像机和目标的距离
     float angdegElevation=90;//仰角
     public float angdegAzimuth=180;//方位角
 
@@ -81,9 +81,9 @@ public class DiceSurfaceView extends GLSurfaceView {
 
         initWorld();//初始化世界
 
-        SensorManager mSensorManager = (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);
+        mSensorManager = (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);
         mAccelerSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        SensorEventListener sensorEventListener = new SensorEventListener() {
+        mSensorEventListener = new SensorEventListener() {
             @Override
             public void onSensorChanged(SensorEvent event) {
 
@@ -105,7 +105,20 @@ public class DiceSurfaceView extends GLSurfaceView {
 
             }
         };
-        mSensorManager.registerListener(sensorEventListener,mAccelerSensor,SensorManager.SENSOR_DELAY_UI);
+        mSensorManager.registerListener(mSensorEventListener,mAccelerSensor,SensorManager.SENSOR_DELAY_UI);
+    }
+
+    @Override
+    public void onPause() {
+        mSensorManager.unregisterListener(mSensorEventListener,mAccelerSensor);
+
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        mSensorManager.registerListener(mSensorEventListener,mAccelerSensor,SensorManager.SENSOR_DELAY_UI);
+        super.onResume();
     }
 
     //初始化物理世界的方法
@@ -126,7 +139,7 @@ public class DiceSurfaceView extends GLSurfaceView {
         //创建物理世界对象
         dynamicsWorld = new DiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver,collisionConfiguration);
         //设置重力加速度
-        dynamicsWorld.setGravity(new Vector3f(0, -52, 0));
+        dynamicsWorld.setGravity(new Vector3f(0, -10, 0));
         //创建共用的立方体,包裹体
         boxShape=new BoxShape(new Vector3f(1.1f,1.1f,1.1f));
 
@@ -143,11 +156,11 @@ public class DiceSurfaceView extends GLSurfaceView {
             case MotionEvent.ACTION_MOVE:
                 float dy = y - mPreviousY;//计算触控笔Y位移
                 float dx = x - mPreviousX;//计算触控笔X位移
-//                angdegAzimuth += dx * TOUCH_SCALE_FACTOR;//设置沿x轴旋转角度
-//                angdegElevation += dy * TOUCH_SCALE_FACTOR;//设置沿z轴旋转角度
+                angdegAzimuth += dx * TOUCH_SCALE_FACTOR;//设置沿x轴旋转角度
+                angdegElevation += dy * TOUCH_SCALE_FACTOR;//设置沿z轴旋转角度
                 //将仰角限制在5～90度范围内
-//                angdegElevation = Math.max(angdegElevation, 5);
-//                angdegElevation = Math.min(angdegElevation, 90);
+                angdegElevation = Math.max(angdegElevation, 5);
+                angdegElevation = Math.min(angdegElevation, 90);
                 //设置摄像机的位置
                 setCameraPostion();
 
@@ -159,7 +172,7 @@ public class DiceSurfaceView extends GLSurfaceView {
                             if (body.isActive() == false) {
                                 body.activate();
                             }
-                            body.setLinearVelocity(new Vector3f(0, 50.0f, 0));
+                            body.setLinearVelocity(new Vector3f(0, 50.0f, 0.0f));
 
                             body.setAngularVelocity(new Vector3f(1, 1, 1));
 //                        GImpactCollisionAlgorithm.registerAlgorithm(dispatcher);
@@ -207,7 +220,7 @@ public class DiceSurfaceView extends GLSurfaceView {
             MatrixState.setCamera
                     (
                             cx,   //人眼位置的X
-                            60, 	//人眼位置的Y
+                            cy, 	//人眼位置的Y
                             cz,   //人眼位置的Z
                             tx, 	//人眼球看的点X
                             ty,   //人眼球看的点Y
@@ -234,44 +247,19 @@ public class DiceSurfaceView extends GLSurfaceView {
             MatrixState.popMatrix();
 
 
-            for(Dice di:mDiceList){
-                //绘制骰子 中间
-                MatrixState.pushMatrix();
-                MatrixState.scale(3.5f, 3.5f, 3.5f);
-                di.drawSelf(0);
-                di.drawSelf(1);
-                MatrixState.popMatrix();
+            synchronized (mDiceList) {
+                for (Dice di : mDiceList) {
+                    synchronized (di) {
+                        //绘制骰子 中间
+                        MatrixState.pushMatrix();
+                        MatrixState.scale(1.8f, 1.8f, 1.8f);
+                        di.drawSelf(0);
+                        di.drawSelf(1);
+                        MatrixState.popMatrix();
+                    }
+                }
             }
 
-//                    //绘制骰子 中间
-//                    MatrixState.pushMatrix();
-////                    MatrixState.translate(0, 7, 0);
-////            MatrixState.rotate(-30,1,1,0);
-//                    MatrixState.scale(3.5f, 3.5f, 3.5f);
-////            MatrixState.rotate(angdegAzimuth,1,1,0);
-//                    mDice.drawSelf(0);
-//            mDice.drawSelf(1);
-//                    MatrixState.popMatrix();
-
-//            绘制骰子 左下
-//            MatrixState.pushMatrix();
-////            MatrixState.translate(15,0,0);
-////            MatrixState.rotate(-30,1,1,0);
-//            MatrixState.scale(3.5f,3.5f,3.5f);
-////            MatrixState.rotate(angdegAzimuth,1,0,1);
-//            mDice2.drawSelf(0);
-//            mDice2.drawSelf(1);
-//            MatrixState.popMatrix();
-//
-//            //绘制骰子 右上
-//            MatrixState.pushMatrix();
-//            MatrixState.translate(-15,5,-10);
-//            MatrixState.rotate(-60,1,1,0);
-//            MatrixState.scale(2.5f,2.5f,2.5f);
-////            MatrixState.rotate(angdegAzimuth,0,1,1);
-//            mDice.drawSelf(0);
-//            mDice.drawSelf(1);
-//            MatrixState.popMatrix();
         }
 
         public void onSurfaceChanged(GL10 gl, int width, int height) {
@@ -319,6 +307,7 @@ public class DiceSurfaceView extends GLSurfaceView {
             //初始化变换矩阵
             MatrixState.setInitStack();
 
+            //上下
             CollisionShape planeShape1;
             planeShape1=new StaticPlaneShape(new Vector3f(1, 0, 0), -10);
             Background mBackground1 = new Background(getContext(),0.0f,planeShape1,dynamicsWorld);
@@ -327,6 +316,7 @@ public class DiceSurfaceView extends GLSurfaceView {
             planeShape2=new StaticPlaneShape(new Vector3f(-1, 0, 0), -10);
             Background mBackground2 = new Background(getContext(),0.0f,planeShape2,dynamicsWorld);
 
+            //左右
             CollisionShape planeShape3;
             planeShape3=new StaticPlaneShape(new Vector3f(0, 0, 1), -6);
             Background mBackground3 = new Background(getContext(),0.0f,planeShape3,dynamicsWorld);
@@ -335,6 +325,7 @@ public class DiceSurfaceView extends GLSurfaceView {
             planeShape4=new StaticPlaneShape(new Vector3f(0, 0, -1), -6);
             Background mBackground4 = new Background(getContext(),0.0f,planeShape4,dynamicsWorld);
 
+            //深浅
             CollisionShape planeShape5;
             planeShape5=new StaticPlaneShape(new Vector3f(0, -1, 0), -10);
             Background mBackground5 = new Background(getContext(),0.0f,planeShape5,dynamicsWorld);
@@ -343,18 +334,13 @@ public class DiceSurfaceView extends GLSurfaceView {
             mBackground = new Background(getContext(),0.0f,planeShape,dynamicsWorld);
 
 
-            for(int i = 0;i<6;i++) {
-                mDice = LoadUtil.loadDiceObj("cube.obj", getResources(), getContext());
+            for(int i = 0;i<5;i++) {
+                mDice = LoadUtil.loadDiceObj("dice_1000.obj", getResources(), getContext());
                 mDice.init(boxShape, dynamicsWorld, 1, i*2, 3, 0);
                 //使得立方体一开始是不激活的
                 mDice.body.forceActivationState(RigidBody.WANTS_DEACTIVATION);
                 mDiceList.add(mDice);
             }
-
-//            mDice2 = LoadUtil.loadDiceObj("cube.obj",getResources(),getContext());
-//            mDice2.init(boxShape,dynamicsWorld,1,4,3,0);
-            //使得立方体一开始是不激活的
-//            mDice2.body.forceActivationState(RigidBody.WANTS_DEACTIVATION);
 
             new Thread()
             {
@@ -381,18 +367,18 @@ public class DiceSurfaceView extends GLSurfaceView {
                                     deltaY = mAy;
                                     deltaZ = mAz;
 
-                                    if(mDx < 0.4f)
+                                    if(mDx < 2.4f)
                                         deltaX = 0;
-                                    if(mDy < 0.4f)
+                                    if(mDy < 2.4f)
                                         deltaY = 0;
-                                    if(mDz < 0.4f) {
+                                    if(mDz < 2.4f) {
                                          deltaZ = 0;
                                     }
                                     Log.i("wch out = ",out.toString()+ "~~~~~");
 
                                     out.x += deltaY;
                                     out.z += deltaX;
-//                                    out.y -= deltaZ;
+                                    out.y -= deltaZ;
 
                                     body.setLinearVelocity(out);
 //                                    body.setAngularVelocity(new Vector3f(0, 0, 0));

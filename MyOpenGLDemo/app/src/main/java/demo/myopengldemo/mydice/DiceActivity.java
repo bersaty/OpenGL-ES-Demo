@@ -6,6 +6,10 @@ import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
 
+/**
+ * Created by wuchunhui on 17-2-21.
+ */
+
 public class DiceActivity extends Activity {
 	private DiceSurfaceView mGLSurfaceView;
     @Override

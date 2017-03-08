@@ -45,6 +45,7 @@ void pointLight(					//定位光光照计算的方法
   specular=lightSpecular*powerFactor;    			//计算镜面光的最终强度
 
   vPosition = vec4(aPosition,1.0);
+  vTextureCoord = aTextureCoord;
 }
 
 void main()
