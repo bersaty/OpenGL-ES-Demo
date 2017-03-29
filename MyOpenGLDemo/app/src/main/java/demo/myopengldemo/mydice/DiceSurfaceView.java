@@ -179,7 +179,8 @@ public class DiceSurfaceView extends GLSurfaceView {
                         }
                     }
 
-                    return false;
+                    //视觉变化
+//                    return false;
 
         }
         mPreviousY = y;//记录触控笔位置
@@ -371,14 +372,17 @@ public class DiceSurfaceView extends GLSurfaceView {
                                         deltaX = 0;
                                     if(mDy < 2.4f)
                                         deltaY = 0;
-                                    if(mDz < 2.4f) {
-                                         deltaZ = 0;
-                                    }
-                                    Log.i("wch out = ",out.toString()+ "~~~~~");
+                                    if(mDz < 2.4f )
+                                        deltaZ = 0;
+                                    Log.i("wch out = ",out.y+ "~~~~~");
 
                                     out.x += deltaY;
                                     out.z += deltaX;
                                     out.y -= deltaZ;
+
+//                                    if(Math.abs(out.y) < 0.8f) {
+//                                        body.setLinearVelocity(new Vector3f(out.x,0,out.y));
+//                                    }
 
                                     body.setLinearVelocity(out);
 //                                    body.setAngularVelocity(new Vector3f(0, 0, 0));
