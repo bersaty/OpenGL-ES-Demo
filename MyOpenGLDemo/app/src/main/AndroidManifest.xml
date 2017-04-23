@@ -95,6 +95,15 @@
                 <category android:name="opengldemo" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".weather.Weather3dActivity"
+            android:label="天气"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="opengldemo" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
