@@ -139,7 +139,7 @@ public class DiceSurfaceView extends GLSurfaceView {
         //创建物理世界对象
         dynamicsWorld = new DiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver,collisionConfiguration);
         //设置重力加速度
-        dynamicsWorld.setGravity(new Vector3f(0, -10, 0));
+        dynamicsWorld.setGravity(new Vector3f(0, -60, 0));
         //创建共用的立方体,包裹体
         boxShape=new BoxShape(new Vector3f(1.1f,1.1f,1.1f));
 
@@ -308,6 +308,14 @@ public class DiceSurfaceView extends GLSurfaceView {
             //初始化变换矩阵
             MatrixState.setInitStack();
 
+            for(int i = 0;i<5;i++) {
+                mDice = LoadUtil.loadDiceObj("dice_1000.obj", getResources(), getContext());
+                mDice.init(boxShape, dynamicsWorld, 1, i*2, 3, 0);
+                //使得立方体一开始是不激活的
+                mDice.body.forceActivationState(RigidBody.WANTS_DEACTIVATION);
+                mDiceList.add(mDice);
+            }
+
             //上下
             CollisionShape planeShape1;
             planeShape1=new StaticPlaneShape(new Vector3f(1, 0, 0), -10);
@@ -335,13 +343,7 @@ public class DiceSurfaceView extends GLSurfaceView {
             mBackground = new Background(getContext(),0.0f,planeShape,dynamicsWorld);
 
 
-            for(int i = 0;i<5;i++) {
-                mDice = LoadUtil.loadDiceObj("dice_1000.obj", getResources(), getContext());
-                mDice.init(boxShape, dynamicsWorld, 1, i*2, 3, 0);
-                //使得立方体一开始是不激活的
-//                mDice.body.forceActivationState(RigidBody.WANTS_DEACTIVATION);
-                mDiceList.add(mDice);
-            }
+
 
             new Thread()
             {

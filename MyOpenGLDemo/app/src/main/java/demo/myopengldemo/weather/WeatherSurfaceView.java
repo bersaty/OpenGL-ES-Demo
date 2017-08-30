@@ -252,7 +252,7 @@ public class WeatherSurfaceView extends GLSurfaceView {
                     synchronized (di) {
                         //绘制骰子 中间
                         MatrixState.pushMatrix();
-                        MatrixState.scale(0.2f, 0.2f, 0.2f);
+                        MatrixState.scale(10.18f, 10.18f, 10.18f);
                         di.drawSelf(0);
                         di.drawSelf(1);
                         MatrixState.popMatrix();
@@ -335,7 +335,7 @@ public class WeatherSurfaceView extends GLSurfaceView {
 
 
             for(int i = 0;i<1;i++) {
-                mWeatherModel = LoadUtil.loadDiceObj("weather.obj", getResources(), getContext());
+                mWeatherModel = LoadUtil.loadDiceObj("dragon.obj", getResources(), getContext());
                 mWeatherModel.init(boxShape, dynamicsWorld, 1, i*2, 0, 0);
                 //使得立方体一开始是不激活的
 //                mWeatherModel.body.forceActivationState(RigidBody.WANTS_DEACTIVATION);
